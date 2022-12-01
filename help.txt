@@ -1,0 +1,18 @@
+&[adventofcode|aoc]
+
+All of the Advent of Code commands.
+
+Commands:
+  about       Learn about Advent of Code
+  countdown   Return time left until next day
+  dayandstar  Get a view that lets you filter the leaderboard by day and star
+  global      Get a link to the global leaderboard
+  join        Learn how to join the leaderboard (via DM)
+  leaderboard Get a snapshot of the PyDis private AoC leaderboard
+  link        Tie your Discord account with your Advent of Code name.
+  stats       Get daily statistics for the Python Discord leaderboard
+  subscribe   NOTE: This command has been moved to &subscribe
+  unlink      Tie your Discord account with your Advent of Code name.
+
+Type &help command for more info on a command.
+You can also type &help category for more info on a category.
