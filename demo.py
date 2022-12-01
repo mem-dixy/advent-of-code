@@ -1,28 +1,11 @@
-elfs = []
-number = 0
-line = True
+def yld123u(u):
+    for i in range(1, 4):
+        u = yield i * u
 
-with open("elf.txt") as file:
-    while line:
-        line = file.readline()
-        match line:
-            case "":
-                line = False
-            case "\n":
-                elfs.append(number)
-                number = 0
-            case _:
-                number += int(line.strip())
 
-print(elfs)
-print(max(elfs))
+cat = range(1, 4)
+print(list(cat))
 
-one = max(elfs)
-elfs.remove(one)
-two = max(elfs)
-elfs.remove(two)
-three = max(elfs)
-elfs.remove(three)
-
-total = one + two + three
-print(total)
+gen = yld123u(4)
+print(gen.send(None))
+print(gen.send(3))
