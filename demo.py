@@ -1,11 +1,12 @@
-def yld123u(u):
-    for i in range(1, 4):
-        u = yield i * u
-
-
-cat = range(1, 4)
-print(list(cat))
-
-gen = yld123u(4)
-print(gen.send(None))
-print(gen.send(3))
+line = True
+with open("elf.txt") as file:
+    while line:
+        line = file.readline()
+        match line:
+            case "":
+                print("EOL")
+            case "\n":
+                print("break")
+            case _:
+                number = int(line.strip())
+                print(number)
