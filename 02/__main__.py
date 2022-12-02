@@ -11,10 +11,11 @@ class Outcome(enum.Enum):
     WON = 6
 
 
+line = True
+score = 0
+total_score = 0
 
-
-with open("input.txt") as file:
-    line = True
+with open("02/input.txt") as file:
     while line:
         line = file.readline()
         if not line:
@@ -31,38 +32,40 @@ with open("input.txt") as file:
 
         match you:
             case "X":
-                you = Shape.ROCK
+                you = Outcome.LOST
             case "Y":
-                you = Shape.PAPER
+                you = Outcome.DRAW
             case "Z":
-                you = Shape.SCISSORS
+                you = Outcome.WON
 
-        match you:
+        match opponent:
             case Shape.ROCK:
-                match opponent:
-                    case Shape.ROCK:
-                        outcome = Outcome.DRAW
-                    case Shape.PAPER:
-                        outcome = Outcome.LOST
-                    case Shape.SCISSORS:
-                        outcome = Outcome.WON
+                match you:
+                    case Outcome.LOST:
+                        outcome = Shape.SCISSORS
+                    case Outcome.DRAW:
+                        outcome = Shape.ROCK
+                    case Outcome.WON:
+                        outcome = Shape.PAPER
             case Shape.PAPER:
                 match you:
-                    case Shape.ROCK:
-                        outcome = Outcome.WON
-                    case Shape.PAPER:
-                        outcome = Outcome.DRAW
-                    case Shape.SCISSORS:
-                        outcome = Outcome.LOST
+                    case Outcome.LOST:
+                        outcome = Shape.ROCK
+                    case Outcome.DRAW:
+                        outcome = Shape.PAPER
+                    case Outcome.WON:
+                        outcome = Shape.SCISSORS
             case Shape.SCISSORS:
-                match opponent:
-                    case Shape.ROCK:
-                        outcome = Outcome.LOST
-                    case Shape.PAPER:
-                        outcome = outcome.WON
-                    case Shape.SCISSORS:
-                        outcome = Outcome.DRAW
+                match you:
+                    case Outcome.LOST:
+                        outcome = Shape.PAPER
+                    case Outcome.DRAW:
+                        outcome = Shape.SCISSORS
+                    case Outcome.WON:
+                        outcome = Shape.ROCK
 
 
+        score = you.value + outcome.value
+        total_score += score
 
-
+print(total_score)
