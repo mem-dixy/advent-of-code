@@ -1,27 +1,68 @@
-calories = 0
-elfs = []
-line = True
+import enum
 
-with open("02/input.txt") as file:
+class Shape(enum.Enum):
+    ROCK = 1
+    PAPER = 2
+    SCISSORS = 3
+
+class Outcome(enum.Enum):
+    LOST = 0
+    DRAW = 3
+    WON = 6
+
+
+
+
+with open("input.txt") as file:
+    line = True
     while line:
         line = file.readline()
-        match line:
-            case "":  # End of file.
-                line = False
-            case "\n":  # Blank line.
-                elfs.append(calories)
-                calories = 0
-            case _:
-                calories += int(line.strip())
+        if not line:
+            break
+        (opponent, you) = tuple(line.split())
+        score = 0
+        match opponent:
+            case "A":
+                opponent = Shape.ROCK
+            case "B":
+                opponent = Shape.PAPER
+            case "C":
+                opponent = Shape.SCISSORS
 
-print(max(elfs))
+        match you:
+            case "X":
+                you = Shape.ROCK
+            case "Y":
+                you = Shape.PAPER
+            case "Z":
+                you = Shape.SCISSORS
 
-one = max(elfs)
-elfs.remove(one)
-two = max(elfs)
-elfs.remove(two)
-three = max(elfs)
-elfs.remove(three)
+        match you:
+            case Shape.ROCK:
+                match opponent:
+                    case Shape.ROCK:
+                        outcome = Outcome.DRAW
+                    case Shape.PAPER:
+                        outcome = Outcome.LOST
+                    case Shape.SCISSORS:
+                        outcome = Outcome.WON
+            case Shape.PAPER:
+                match you:
+                    case Shape.ROCK:
+                        outcome = Outcome.WON
+                    case Shape.PAPER:
+                        outcome = Outcome.DRAW
+                    case Shape.SCISSORS:
+                        outcome = Outcome.LOST
+            case Shape.SCISSORS:
+                match opponent:
+                    case Shape.ROCK:
+                        outcome = Outcome.LOST
+                    case Shape.PAPER:
+                        outcome = outcome.WON
+                    case Shape.SCISSORS:
+                        outcome = Outcome.DRAW
 
-total = one + two + three
-print(total)
+
+
+
