@@ -15,22 +15,21 @@ def priority(letter):
 
 with open("03/input.txt") as file:
     while line:
-        one = file.readline().strip()
-        two = file.readline().strip()
-        three = file.readline().strip()
-        if not one:
+        line = file.readline().strip()
+        if not line:
             break
+        full = len(line)
+        half = full // 2
+        one = line[0:half]
+        two = line[half:full]
         left = set({})
-        middle = set({})
         right = set({})
         for item in one:
             left.add(item)
         for item in two:
-            middle.add(item)
-        for item in three:
             right.add(item)
 
-        both = left & middle & right
+        both = left & right
         for item in both:
             letter = item
 
