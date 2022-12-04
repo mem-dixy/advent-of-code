@@ -17,7 +17,8 @@ with open("04/input.txt") as file:
         (left, right) = tuple(line.split(","))
         left = myrange(left)
         right = myrange(right)
-        if left <= right or right <= left:
+        # if left <= right or right <= left:
+        if left & right:
             count += 1
 
 print(count)
