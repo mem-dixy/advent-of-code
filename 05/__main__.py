@@ -1,17 +1,18 @@
-line = True
-count = 0
+def get_raw_data():
+    with open("05/input.txt") as file:
+        line = file.readlines()
+        string = "".join(line)
+        (top, bottom) = string.split("\n\n")
+        return (top, bottom)
 
-with open("05/input.txt") as file:
-    line = file.readlines()
-    string = "".join(line)
 
-    (top, bottom) = string.split("\n\n")
+def get_stack_data():
     top_lines = top.split("\n")
     length_top_lines = len(top_lines) - 1
     index = top_lines[length_top_lines]
 
-    STACKS = ((len(index)) // 4) + 1
-    LINE_LENGTH = ((STACKS - 1) * 4) + 3
+    STACK_COUNT = ((len(index)) // 4) + 1
+    LINE_LENGTH = ((STACK_COUNT - 1) * 4) + 3
 
     top_lines = top_lines[0:length_top_lines]
     new_top_lines = []
@@ -22,11 +23,30 @@ with open("05/input.txt") as file:
         pad = pad.replace("    ", " [_]")
         new_top_lines.append(pad)
 
-    print(new_top_lines)
+    # bottom up processing
+    stacks = []
+    new_top_lines.reverse()
+    for item in range(STACK_COUNT):
+        stacks.append([])
+
+    for lines in new_top_lines:
+        splitt = lines.split(" ")
+        for item in range(STACK_COUNT):
+            hold = splitt[item]
+            hold = hold[1]
+            if hold != "_":
+                stacks[item].append(hold)
+
+    return stacks
 
 
-    cat = "\n".join(new_top_lines)
+(top, bottom) = get_raw_data()
 
-    print(cat)
-    print("------------")
-    print(bottom)
+stack_data = get_stack_data()
+
+
+
+print(stack_data)
+
+print("------------")
+print(bottom)
