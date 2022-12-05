@@ -6,7 +6,7 @@ def get_raw_data():
         return (top, bottom)
 
 
-def get_stack_data():
+def get_stack_data(top):
     top_lines = top.split("\n")
     length_top_lines = len(top_lines) - 1
     index = top_lines[length_top_lines]
@@ -39,14 +39,24 @@ def get_stack_data():
 
     return stacks
 
+def get_crane_data(bottom):
+    crane = []
+    lines = bottom.split("\n")
+    for line in lines:
+        if line:
+            sub = line.split(" ")
+            move = int(sub[1])
+            frm = int(sub[3])
+            too = int(sub[5])
+            for ignore in range(move):
+                crane.append((frm, too))
+    return crane
 
 (top, bottom) = get_raw_data()
-
-stack_data = get_stack_data()
+stack_data = get_stack_data(top)
+crane_data = get_crane_data(bottom)
 
 
 
 print(stack_data)
-
-print("------------")
-print(bottom)
+print(crane_data)
