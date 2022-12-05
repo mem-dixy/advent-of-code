@@ -56,7 +56,17 @@ def get_crane_data(bottom):
 stack_data = get_stack_data(top)
 crane_data = get_crane_data(bottom)
 
+for data in crane_data:
+    (frm, too) = data
+    frm -= 1
+    too -= 1
+    pickup = stack_data[frm].pop(-1)
+    stack_data[too].append(pickup)
 
+result = ""
+for data in stack_data:
+    result += data[-1]
 
 print(stack_data)
 print(crane_data)
+print(result)
