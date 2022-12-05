@@ -48,8 +48,7 @@ def get_crane_data(bottom):
             move = int(sub[1])
             frm = int(sub[3])
             too = int(sub[5])
-            for ignore in range(move):
-                crane.append((frm, too))
+            crane.append((move, frm, too))
     return crane
 
 (top, bottom) = get_raw_data()
@@ -57,11 +56,15 @@ stack_data = get_stack_data(top)
 crane_data = get_crane_data(bottom)
 
 for data in crane_data:
-    (frm, too) = data
+    (move, frm, too) = data
     frm -= 1
     too -= 1
-    pickup = stack_data[frm].pop(-1)
-    stack_data[too].append(pickup)
+    hold = []
+    for times in range(move):
+        pickup = stack_data[frm].pop(-1)
+        hold.append(pickup)
+    hold.reverse()
+    stack_data[too].extend(hold)
 
 result = ""
 for data in stack_data:
