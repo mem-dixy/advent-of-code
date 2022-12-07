@@ -58,6 +58,11 @@ class Directory():
         self.size = total
         return self.size
 
+    def all_sizes(self):
+        sizes = [self.size]
+        for item in self.directories:
+            sizes += item.all_sizes()
+        return sizes
 
     def special_count(self, limit):
         total = 0
@@ -129,12 +134,26 @@ with open("input.txt") as file:
 
 
 limit = 100000
+total_space = 70000000
+space_needed = 30000000
 
 system.root.my_size()
 
 system.root.display(0)
 
-value = system.root.special_count(limit)
+part_1_answer = system.root.special_count(limit)
+print(part_1_answer)
 
-print(value)
+available_space = total_space - system.root.size
+
+need_to_delete = space_needed - available_space
+
+sizes = system.root.all_sizes()
+sizes.sort()
+remove_too_small = [item for item in sizes if item >= need_to_delete]
+print(need_to_delete)
+print(sizes)
+print(remove_too_small)
+print(remove_too_small[0])
+
 print("done")
