@@ -3,6 +3,18 @@ class File():
         self.name = name
         self.size = size
 
+    def display(self, index):
+        indent = ""
+        for ignore in range(index):
+            indent += "  "
+        print(F"{indent}- {self.name} (file, size={self.size})")
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
+
 
 class Directory():
     def __init__(self, name):
@@ -22,25 +34,35 @@ class Directory():
                 return item
         return None
 
-    def display(self, indent):
-        for ignore in range(indent):
-            print(" ", end="")
-        print(self.name)
-        for item in self.directories:
-            item.display(indent+1)
+    def display(self, index):
+        indent = ""
+        for ignore in range(index):
+            indent += "  "
+        print(F"{indent}- {self.name} (dir)")
 
+        collection = self.directories + self.files
+        collection.sort()
+
+        for item in collection:
+            item.display(index + 1)
+
+    def __lt__(self, other):
+        return self.name < other.name
+
+    def __eq__(self, other):
+        return self.name == other.name
 
 class Filesystem(Directory):
     def __init__(self):
-        super().__init__("/")
         self.path = []
+        self.root = Directory("/")
 
     def move_in(self, directory):
         self.path.append(directory)
 
 
     def nested(self):
-        pointer = self
+        pointer = self.root
         for name in self.path:
             pointer = pointer.find(name)
         return pointer
@@ -49,7 +71,7 @@ class Filesystem(Directory):
         self.path.pop(-1)
 
     def move_root(self):
-        self.path = ["/"]
+        self.path = []
 
     def push_directory(self, directory):
         pointer = self.nested()
@@ -65,8 +87,9 @@ class Filesystem(Directory):
 system = Filesystem()
 
 with open("input.txt") as file:
-    line = "dir /"
+    line = True
     while line:
+        line = file.readline().strip()
         match line.split():
             case ["$", "cd", ".."]:
                 system.move_out()
@@ -81,9 +104,10 @@ with open("input.txt") as file:
             case [size, name]:
                 system.push_file(File(name, size))
 
-        line = file.readline().strip()
 
 
 
-system.display(0)
-print(system)
+
+system.root.display(0)
+
+print("done")
