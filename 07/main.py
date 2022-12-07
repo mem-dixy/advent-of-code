@@ -1,7 +1,7 @@
 class File():
     def __init__(self, name, size):
         self.name = name
-        self.size = size
+        self.size = int(size)
 
     def display(self, index):
         indent = ""
@@ -15,12 +15,16 @@ class File():
     def __eq__(self, other):
         return self.name == other.name
 
+    def my_size(self):
+        return self.size
+
 
 class Directory():
     def __init__(self, name):
         self.name = name
         self.directories = []
         self.files = []
+        self.size = 0
 
     def add_file(self, file):
         self.files.append(file)
@@ -38,13 +42,23 @@ class Directory():
         indent = ""
         for ignore in range(index):
             indent += "  "
-        print(F"{indent}- {self.name} (dir)")
+        print(F"{indent}- {self.name} (dir, size={self.size})")
 
         collection = self.directories + self.files
         collection.sort()
 
         for item in collection:
             item.display(index + 1)
+
+    def my_size(self):
+        total = 0
+        collection = self.directories + self.files
+        for item in collection:
+            total += item.my_size()
+        self.size = total
+        return self.size
+
+
 
     def __lt__(self, other):
         return self.name < other.name
@@ -106,7 +120,9 @@ with open("input.txt") as file:
 
 
 
+limit = 100000
 
+system.root.my_size()
 
 system.root.display(0)
 
