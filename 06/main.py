@@ -1,8 +1,12 @@
 string = ""
 
+SIZE = 14
+
 class Buffer():
     def __init__(self):
-        self.hold = ["", "", "", ""]
+        self.hold = []
+        for ignore in range(SIZE):
+            self.hold.append(None)
         self.count = 0
         self.index = 0
 
@@ -10,17 +14,17 @@ class Buffer():
         self.hold[self.index] = item
         self.count += 1
         self.index += 1
-        self.index %= 4
+        self.index %= SIZE
 
     def found(self):
         test = set()
-        test.add(self.hold[0])
-        test.add(self.hold[1])
-        test.add(self.hold[2])
-        test.add(self.hold[3])
-        if "" in test:
+        for index in range(SIZE):
+            test.add(self.hold[index])
+
+        if None in test:
             return False
-        return len(test) == 4
+
+        return len(test) == SIZE
 
 
 with open("input.txt") as file:
