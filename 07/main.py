@@ -59,6 +59,14 @@ class Directory():
         return self.size
 
 
+    def special_count(self, limit):
+        total = 0
+        for item in self.directories:
+            total += item.special_count(limit)
+            if item.size < limit:
+                total += item.size
+        return total
+
 
     def __lt__(self, other):
         return self.name < other.name
@@ -126,4 +134,7 @@ system.root.my_size()
 
 system.root.display(0)
 
+value = system.root.special_count(limit)
+
+print(value)
 print("done")
