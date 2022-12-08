@@ -1,12 +1,14 @@
 import io
 
-VISIBLE = "_"
-HIDDEN = "#"
-MYSTERY = "$"
+VISIBLE = "."
+HIDDEN = "_"
+
+TREE_HOUSE = "$"
+PRETTY_TREES = "%"
 
 grid = []
 forest = []
-
+scores = []
 # 0 min 9 max
 # 1 min 10 max
 with open("input.txt") as file:
@@ -15,7 +17,8 @@ with open("input.txt") as file:
         for item in line.strip():
             number = int(item)
             grid.append(number)
-            forest.append(MYSTERY)
+            forest.append(HIDDEN)
+            scores.append(0)
 
 width = len(lines[0]) - 1
 size = len(grid)
@@ -28,6 +31,9 @@ down = + width
 
 
 def this_is_edge(index):
+    row = index // width
+    col = index % width
+
     north = row - 1 < 0
     south = row + 1 >= height
     east = col + 1 >= width
@@ -38,8 +44,6 @@ def this_is_edge(index):
 
 # show edges
 for index in range(size):
-    row = index // width
-    col = index % width
     if this_is_edge(index):
         forest[index] = VISIBLE
 
@@ -99,22 +103,79 @@ show_forest()
 
 
 
-def travel_left(index):
-    pass
-def travel_right(index):
-    pass
-def travel_up(index):
-    pass
-def travel_down(index):
-    pass
-
-# all non edge trees
-for index_y in range(1, height - 1):
-    for index_x in range(1, width - 1):
+def travel_left(row, col, tallness, magic):
+    seen = 0
+    index_y = row
+    for index_x in range(col - 1, 0 - 1, -1):
         index = index_y * width + index_x
-        print(grid[index])
+        seen += 1
+        if magic:
+            forest[index] = PRETTY_TREES
+        if grid[index] >= tallness:
+            return seen
+    return seen
+
+def travel_right(row, col, tallness, magic):
+    seen = 0
+    index_y = row
+    for index_x in range(col + 1, width):
+        index = index_y * width + index_x
+        seen += 1
+        if magic:
+            forest[index] = PRETTY_TREES
+        if grid[index] >= tallness:
+            return seen
+    return seen
+
+def travel_up(row, col, tallness, magic):
+    seen = 0
+    index_x = col
+    for index_y in range(row - 1, 0 - 1, -1):
+        index = index_y * width + index_x
+        seen += 1
+        if magic:
+            forest[index] = PRETTY_TREES
+        if grid[index] >= tallness:
+            return seen
+    return seen
+
+def travel_down(row, col, tallness, magic):
+    seen = 0
+    index_x = col
+    for index_y in range(row + 1, height):
+        index = index_y * width + index_x
+        seen += 1
+        if magic:
+            forest[index] = PRETTY_TREES
+        if grid[index] >= tallness:
+            return seen
+    return seen
 
 
+# find treehouse
+index = 0
+for index in range(size):
+    if this_is_edge(index):
+        continue
+
+    tallness = grid[index]
+    row = index // width
+    col = index % width
+
+    magic = index == 741
+    if magic:
+        forest[index] = TREE_HOUSE
+    score = 1
+    score *= travel_left(row, col, tallness, magic)
+    score *= travel_right(row, col, tallness, magic)
+    score *= travel_up(row, col, tallness, magic)
+    score *= travel_down(row, col, tallness, magic)
+    scores[index] = score
+    if score == 252000:
+        print(index)
+
+show_forest()  # again
+print(max(scores))
 # count trees: my height < next height = +1 tree seen
 # if edge: trees += 0 break
 # if next >= us: trees += 1 break
