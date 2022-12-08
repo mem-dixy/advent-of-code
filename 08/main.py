@@ -50,13 +50,48 @@ for index_x in range(1, width - 1):
         forest[index] = VISIBLE
 
 
+# from the bottom
+for index_x in range(1, width - 1):
+    tallest = grid[size - width + index_x]
+    for index_y in range(height - 2, 0, -1):
+        index = index_y * width + index_x
+        if grid[index] <= tallest:
+            break
+        tallest = grid[index]
+        #forest[index] = VISIBLE
+
+
+
+# from the left TODO
+for index_y in range(1, height - 1):
+    tallest = grid[index_y * width]
+    for index_x in range(0 + 1, width - 1, +1):
+        index = index_y * width + index_x
+        if grid[index] <= tallest:
+            break
+        tallest = grid[index]
+        forest[index] = VISIBLE
+
+# from the right TODO
+for index_y in range(1, height - 1):
+    tallest = grid[index_y * width + width - 1]
+    for index_x in range(width - 2, 0, -1):
+        index = index_y * width + index_x
+        if grid[index] <= tallest:
+            break
+        tallest = grid[index]
+        forest[index] = VISIBLE
+
 def show_forest():
     visible = 0
     string = io.StringIO()
     for index_y in range(height):
         for index_x in range(width):
             index = index_y * width + index_x
-            string.write(forest[index])
+            tree = forest[index]
+            if tree == VISIBLE:
+                visible += 1
+            string.write(tree)
         string.write("\n")
     print(string.getvalue())
     print(visible)
