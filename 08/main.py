@@ -1,6 +1,11 @@
 import io
 
+VISIBLE = "_"
+HIDDEN = "#"
+MYSTERY = "$"
+
 grid = []
+forest = []
 
 # 0 min 9 max
 # 1 min 10 max
@@ -9,27 +14,40 @@ with open("input.txt") as file:
     for line in lines:
         for item in line.strip():
             number = int(item)
-            grid.append(number + 1)
+            grid.append(number)
+            forest.append(MYSTERY)
 
 width = len(lines[0]) - 1
 size = len(grid)
 height = size // width
-visible = height + height + width + width - 4
 
 left = -1
 right = + 1
-up = +width
-down = -width
+up = -width
+down = + width
 
 
-def forest(tree):
-    pass
-
+# show edges
 for index in range(size):
-
     row = index // width
     col = index % width
-    print(grid[index], row, col)
+
+    north = row - 1 < 0
+    south = row + 1 >= height
+    east = col + 1 >= width
+    west = col - 1 < 0
+    if north or south or east or west:
+        forest[index] = VISIBLE
+
+# from the top
+for index_x in range(1, width - 1):
+    tallest = grid[index_x]
+    for index_y in range(1, height - 1):
+        index = index_y * width + index_x
+        if grid[index] <= tallest:
+            break
+        tallest = grid[index]
+        forest[index] = VISIBLE
 
 
 def show_forest():
@@ -38,11 +56,7 @@ def show_forest():
     for index_y in range(height):
         for index_x in range(width):
             index = index_y * width + index_x
-            if grid[index] < 5:
-                string.write("_")
-                visible += 1
-            else:
-                string.write("*")
+            string.write(forest[index])
         string.write("\n")
     print(string.getvalue())
     print(visible)
