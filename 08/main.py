@@ -27,16 +27,20 @@ up = -width
 down = + width
 
 
-# show edges
-for index in range(size):
-    row = index // width
-    col = index % width
-
+def this_is_edge(index):
     north = row - 1 < 0
     south = row + 1 >= height
     east = col + 1 >= width
     west = col - 1 < 0
-    if north or south or east or west:
+    return north or south or east or west
+
+
+
+# show edges
+for index in range(size):
+    row = index // width
+    col = index % width
+    if this_is_edge(index):
         forest[index] = VISIBLE
 
 # from the top
@@ -57,7 +61,6 @@ for index_x in range(1, width - 1):
         if grid[index] > tallest:
             tallest = grid[index]
             forest[index] = VISIBLE
-
 
 
 # from the left
@@ -93,3 +96,27 @@ def show_forest():
     print(visible)
 
 show_forest()
+
+
+
+def travel_left(index):
+    pass
+def travel_right(index):
+    pass
+def travel_up(index):
+    pass
+def travel_down(index):
+    pass
+
+# all non edge trees
+for index_y in range(1, height - 1):
+    for index_x in range(1, width - 1):
+        index = index_y * width + index_x
+        print(grid[index])
+
+
+# count trees: my height < next height = +1 tree seen
+# if edge: trees += 0 break
+# if next >= us: trees += 1 break
+# if next < us: trees += 1 continue
+# up * down *right * left
