@@ -44,10 +44,9 @@ for index_x in range(1, width - 1):
     tallest = grid[index_x]
     for index_y in range(1, height - 1):
         index = index_y * width + index_x
-        if grid[index] <= tallest:
-            break
-        tallest = grid[index]
-        forest[index] = VISIBLE
+        if grid[index] > tallest:
+            tallest = grid[index]
+            forest[index] = VISIBLE
 
 
 # from the bottom
@@ -55,32 +54,29 @@ for index_x in range(1, width - 1):
     tallest = grid[size - width + index_x]
     for index_y in range(height - 2, 0, -1):
         index = index_y * width + index_x
-        if grid[index] <= tallest:
-            break
-        tallest = grid[index]
-        #forest[index] = VISIBLE
+        if grid[index] > tallest:
+            tallest = grid[index]
+            forest[index] = VISIBLE
 
 
 
-# from the left TODO
+# from the left
 for index_y in range(1, height - 1):
     tallest = grid[index_y * width]
     for index_x in range(0 + 1, width - 1, +1):
         index = index_y * width + index_x
-        if grid[index] <= tallest:
-            break
-        tallest = grid[index]
-        forest[index] = VISIBLE
+        if grid[index] > tallest:
+            tallest = grid[index]
+            forest[index] = VISIBLE
 
-# from the right TODO
+# from the right
 for index_y in range(1, height - 1):
     tallest = grid[index_y * width + width - 1]
     for index_x in range(width - 2, 0, -1):
         index = index_y * width + index_x
-        if grid[index] <= tallest:
-            break
-        tallest = grid[index]
-        forest[index] = VISIBLE
+        if grid[index] > tallest:
+            tallest = grid[index]
+            forest[index] = VISIBLE
 
 def show_forest():
     visible = 0
