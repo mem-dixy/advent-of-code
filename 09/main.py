@@ -24,6 +24,81 @@ LEFT = "L"
 RIGHT = "R"
 UP = "U"
 
+
+
+class Tile():
+    def __init__(self, width, height, position_x, position_y):
+        self.width = width
+        self.height = height
+        self.index_x = position_x
+        self.index_y = position_y
+
+    def index(self):
+        return self.index_y * self.width + self.index_x
+
+    def draw(self, grid, shape):
+        grid[self.index()] = shape
+
+    def down(self):
+        self.index_y += 1
+
+    def left(self):
+        self.index_x -= 1
+
+    def right(self):
+        self.index_x += 1
+
+    def up(self):
+        self.index_y -= 1
+
+
+
+class Head(Tile):
+    def move(self, direction):
+        match direction:
+            case "D":
+                self.down()
+            case "L":
+                self.left()
+            case "R":
+                self.right()
+            case "U":
+                self.up()
+
+class Tail(Tile):
+    def move(self, head):
+        distance_x = abs(head.index_x - self.index_x)
+        distance_y = abs(head.index_y - self.index_y)
+        distance = distance_x + distance_y
+
+        if distance == 2 and distance_x != distance_y:
+            if head.index_x > self.index_x:
+                self.right()
+            if head.index_x < self.index_x:
+                self.left()
+            if head.index_y > self.index_y:
+                self.down()
+            if head.index_y < self.index_y:
+                self.up()
+
+        if distance == 3 and head.index_y > self.index_y:
+            if head.index_x > self.index_x:
+                self.down()
+                self.right()
+            if head.index_x < self.index_x:
+                self.down()
+                self.left()
+
+        if distance == 3 and head.index_y < self.index_y:
+            if head.index_x > self.index_x:
+                self.up()
+                self.right()
+            if head.index_x < self.index_x:
+                self.up()
+                self.left()
+
+
+
 @dataclasses.dataclass
 class Direction():
     direction: str
@@ -133,93 +208,28 @@ def print_maze(draw_maze, draw_trail):
         string.write("\n")
     print(string.getvalue())
 
-head_index_x = position_x
-head_index_y = position_y
-tail_index_x = position_x
-tail_index_y = position_y
+
+
+head = Head(width, height, position_x, position_y)
+tail = Tail(width, height, position_x, position_y)
+
 for line in lines:
     direction = line.direction
     steps = line.steps
     for step in range(steps):
-        head_index = head_index_y * width + head_index_x
-        tail_index = tail_index_y * width + tail_index_x
 
-        head_goto = head_index
-        tail_goto = tail_index
+        tail.draw(maze, EMPTY)
+        head.draw(maze, EMPTY)
 
-        match direction:
-            case "D":
-                head_goto += down
-                head_index_y += 1
-            case "L":
-                head_goto += left
-                head_index_x -= 1
-            case "R":
-                head_goto += right
-                head_index_x += 1
-            case "U":
-                head_goto += up
-                head_index_y -= 1
+        head.move(direction)
+        tail.move(head)
 
-        maze[head_index] = TAIL if maze[head_index] == BOTH else EMPTY
-        maze[head_goto] = BOTH if maze[head_goto] == TAIL else HEAD
+        tail.draw(maze, TAIL)
+        head.draw(maze, HEAD)
 
-        distance_x = abs(head_index_x - tail_index_x)
-        distance_y = abs(head_index_y - tail_index_y)
-        distance = distance_x + distance_y
-        match distance:
-            case 0:
-                pass
-            case 1:
-                pass
-            case 2:
-                if distance_x != distance_y:
-                    if distance_x > 0:
-                        if head_index_x > tail_index_x:
-                            tail_goto += right
-                            tail_index_x += 1
-                        if head_index_x < tail_index_x:
-                            tail_goto += left
-                            tail_index_x -= 1
-                    if distance_y > 0:
-                        if head_index_y > tail_index_y:
-                            tail_goto += down
-                            tail_index_y += 1
-                        if head_index_y < tail_index_y:
-                            tail_goto += up
-                            tail_index_y -= 1
-            case 3:
-                if head_index_y > tail_index_y:
-                    if head_index_x > tail_index_x:
-                        tail_goto += down
-                        tail_goto += right
-                        tail_index_x += 1
-                        tail_index_y += 1
-                    if head_index_x < tail_index_x:
-                        tail_goto += down
-                        tail_goto += left
-                        tail_index_x -= 1
-                        tail_index_y += 1
-                if head_index_y < tail_index_y:
-                    if head_index_x > tail_index_x:
-                        tail_goto += up
-                        tail_goto += right
-                        tail_index_x += 1
-                        tail_index_y -= 1
-                    if head_index_x < tail_index_x:
-                        tail_goto += up
-                        tail_goto += left
-                        tail_index_x -= 1
-                        tail_index_y -= 1
-            case _:
-                pass
+        trail[tail.index()] = True
 
-        maze[tail_index] = HEAD if maze[tail_index] == BOTH else EMPTY
-        maze[tail_goto] = BOTH if maze[tail_goto] == HEAD else TAIL
-
-        trail[tail_goto] = True
-
-        # print_maze(True, False)
+        print_maze(True, False)
 
 
 print_maze(False, True)
