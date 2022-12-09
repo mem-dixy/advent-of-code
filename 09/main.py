@@ -13,11 +13,11 @@ import typing
 
 
 EMPTY = "."
-START = "S"
 VISITED = "#"
 
 HEAD = "H"
 TAIL = "T"
+BOTH = "S"
 
 DOWN = "D"
 LEFT = "L"
@@ -28,9 +28,6 @@ UP = "U"
 class Direction():
     direction: str
     steps: int
-
-
-
 
 
 def parse_input(
@@ -56,8 +53,6 @@ def find_maze_limit(
     }
     for line in lines:
         directions[line.direction] += line.steps
-    width = directions[LEFT] + directions[RIGHT]
-    height = directions[DOWN] + directions[UP]
     return directions
 
 def find_maze_size(
@@ -81,8 +76,13 @@ for index_y in range(height):
         trail.append(False)
 
 index = position_y * width + position_x
-maze[index] = START
+maze[index] = BOTH
 trail[index] = True
+
+left = -1
+right = + 1
+up = -width
+down = + width
 
 
 
@@ -121,6 +121,37 @@ def print_maze(draw_maze, draw_trail):
             string.write(draw)
         string.write("\n")
     print(string.getvalue())
+
+head_index_x = position_x
+head_index_y = position_y
+tail_index_x = position_x
+tail_index_y = position_y
+for line in lines:
+    direction = line.direction
+    steps = line.steps
+    for step in range(steps):
+        head_index = head_index_y * width + head_index_x
+        tail_index = tail_index_y * width + tail_index_x
+
+        head_goto = head_index
+
+        match direction:
+            case "D":
+                head_goto += down
+                head_index_y += 1
+            case "L":
+                head_goto += left
+                head_index_x -= 1
+            case "R":
+                head_goto += right
+                head_index_x += 1
+            case "U":
+                head_goto += up
+                head_index_y -= 1
+
+        maze[head_goto] = BOTH if maze[head_index] == TAIL else HEAD
+        maze[head_index] = TAIL if maze[head_index] == BOTH else EMPTY
+
 
 print_maze(True, True)
 print_visited()
