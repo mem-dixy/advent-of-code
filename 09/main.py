@@ -42,30 +42,41 @@ def parse_input(
                 lines.append(direction)
     return lines
 
-def find_maze_limit(
-    lines: list[Direction]
-) -> typing.Dict[str, int]:
-    directions = {
-        DOWN: 0,
-        LEFT: 0,
-        RIGHT: 0,
-        UP: 0,
-    }
-    for line in lines:
-        directions[line.direction] += line.steps
-    return directions
 
 def find_maze_size(
     directions: typing.Dict[str, int]
 ) -> typing.Tuple[int]:
-    width = 1 + directions[LEFT] + directions[RIGHT]
-    height = 1 + directions[DOWN] + directions[UP]
-    return (width, height, directions[LEFT], directions[UP])
+    index_x = 0
+    index_y = 0
+    min_x = 0
+    max_x = 0
+    min_y = 0
+    max_y = 0
+    for line in lines:
+        steps = line.steps
+        match line.direction:
+            case "D":
+                index_y += steps
+            case "L":
+                index_x -= steps
+            case "R":
+                index_x += steps
+            case "U":
+                index_y -= steps
+
+        min_x = min(min_x, index_x)
+        max_x = max(max_x, index_x)
+        min_y = min(min_y, index_y)
+        max_y = max(max_y, index_y)
+
+    width = 1 + abs(min_x) + max_x
+    height = 1 + abs(min_y) + max_y
+    return (width, height, abs(min_x), abs(min_y))
 
 
 # generate maze
 lines = parse_input()
-directions = find_maze_limit(lines)
+directions = find_maze_size(lines)
 (width, height, position_x, position_y) = find_maze_size(directions)
 maze = []
 trail = []
@@ -211,7 +222,7 @@ for line in lines:
         # print_maze(True, False)
 
 
-# print_maze(False, True)
+print_maze(False, True)
 print_visited()
 # all touching
 # ***
