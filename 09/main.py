@@ -134,6 +134,7 @@ for line in lines:
         tail_index = tail_index_y * width + tail_index_x
 
         head_goto = head_index
+        tail_goto = tail_index
 
         match direction:
             case "D":
@@ -149,8 +150,61 @@ for line in lines:
                 head_goto += up
                 head_index_y -= 1
 
-        maze[head_goto] = BOTH if maze[head_index] == TAIL else HEAD
         maze[head_index] = TAIL if maze[head_index] == BOTH else EMPTY
+        maze[head_goto] = BOTH if maze[head_goto] == TAIL else HEAD
+
+        distance_x = abs(head_index_x - tail_index_x)
+        distance_y = abs(head_index_y - tail_index_y)
+        distance = distance_x + distance_y
+        match distance:
+            case 0:
+                pass
+            case 1:
+                pass
+            case 2:
+                if distance_x != distance_y:
+                    if distance_x > 0:
+                        if head_index_x > tail_index_x:
+                            tail_goto += right
+                            tail_index_x += 1
+                        if head_index_x < tail_index_x:
+                            tail_goto += left
+                            tail_index_x -= 1
+                    if distance_y > 0:
+                        if head_index_y > tail_index_y:
+                            tail_goto += down
+                            tail_index_y += 1
+                        if head_index_y < tail_index_y:
+                            tail_goto += up
+                            tail_index_y -= 1
+            case 3:
+                if head_index_y > tail_index_y:
+                    if head_index_x > tail_index_x:
+                        tail_goto += down
+                        tail_goto += right
+                        tail_index_x += 1
+                        tail_index_y += 1
+                    if head_index_x < tail_index_x:
+                        tail_goto += down
+                        tail_goto += left
+                        tail_index_x -= 1
+                        tail_index_y += 1
+                if head_index_y < tail_index_y:
+                    if head_index_x > tail_index_x:
+                        tail_goto += up
+                        tail_goto += right
+                        tail_index_x += 1
+                        tail_index_y -= 1
+                    if head_index_x < tail_index_x:
+                        tail_goto += up
+                        tail_goto += left
+                        tail_index_x -= 1
+                        tail_index_y -= 1
+            case _:
+                pass
+
+        maze[tail_index] = HEAD if maze[tail_index] == BOTH else EMPTY
+        maze[tail_goto] = BOTH if maze[tail_goto] == HEAD else TAIL
 
 
 print_maze(True, True)
