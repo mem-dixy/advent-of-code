@@ -66,34 +66,34 @@ class Head(Tile):
                 self.up()
 
 class Tail(Tile):
-    def move(self, head):
-        distance_x = abs(head.index_x - self.index_x)
-        distance_y = abs(head.index_y - self.index_y)
+    def move(self, goto):
+        distance_x = abs(goto.index_x - self.index_x)
+        distance_y = abs(goto.index_y - self.index_y)
         distance = distance_x + distance_y
 
         if distance == 2 and distance_x != distance_y:
-            if head.index_x > self.index_x:
+            if goto.index_x > self.index_x:
                 self.right()
-            if head.index_x < self.index_x:
+            if goto.index_x < self.index_x:
                 self.left()
-            if head.index_y > self.index_y:
+            if goto.index_y > self.index_y:
                 self.down()
-            if head.index_y < self.index_y:
+            if goto.index_y < self.index_y:
                 self.up()
 
-        if distance == 3 and head.index_y > self.index_y:
-            if head.index_x > self.index_x:
+        if distance == 3 and goto.index_y > self.index_y:
+            if goto.index_x > self.index_x:
                 self.down()
                 self.right()
-            if head.index_x < self.index_x:
+            if goto.index_x < self.index_x:
                 self.down()
                 self.left()
 
-        if distance == 3 and head.index_y < self.index_y:
-            if head.index_x > self.index_x:
+        if distance == 3 and goto.index_y < self.index_y:
+            if goto.index_x > self.index_x:
                 self.up()
                 self.right()
-            if head.index_x < self.index_x:
+            if goto.index_x < self.index_x:
                 self.up()
                 self.left()
 
@@ -211,23 +211,55 @@ def print_maze(draw_maze, draw_trail):
 
 
 head = Head(width, height, position_x, position_y)
-tail = Tail(width, height, position_x, position_y)
+tail_1 = Tail(width, height, position_x, position_y)
+tail_2 = Tail(width, height, position_x, position_y)
+tail_3 = Tail(width, height, position_x, position_y)
+tail_4 = Tail(width, height, position_x, position_y)
+tail_5 = Tail(width, height, position_x, position_y)
+tail_6 = Tail(width, height, position_x, position_y)
+tail_7 = Tail(width, height, position_x, position_y)
+tail_8 = Tail(width, height, position_x, position_y)
+tail_9 = Tail(width, height, position_x, position_y)
 
 for line in lines:
     direction = line.direction
     steps = line.steps
     for step in range(steps):
 
-        tail.draw(maze, EMPTY)
+        tail_9.draw(maze, EMPTY)
+        tail_8.draw(maze, EMPTY)
+        tail_7.draw(maze, EMPTY)
+        tail_6.draw(maze, EMPTY)
+        tail_5.draw(maze, EMPTY)
+        tail_4.draw(maze, EMPTY)
+        tail_3.draw(maze, EMPTY)
+        tail_2.draw(maze, EMPTY)
+        tail_1.draw(maze, EMPTY)
         head.draw(maze, EMPTY)
 
         head.move(direction)
-        tail.move(head)
+        tail_1.move(head)
+        tail_2.move(tail_1)
+        tail_3.move(tail_2)
+        tail_4.move(tail_3)
+        tail_5.move(tail_4)
+        tail_6.move(tail_5)
+        tail_7.move(tail_6)
+        tail_8.move(tail_7)
+        tail_9.move(tail_8)
 
-        tail.draw(maze, TAIL)
+        tail_9.draw(maze, "9")
+        tail_8.draw(maze, "8")
+        tail_7.draw(maze, "7")
+        tail_6.draw(maze, "6")
+        tail_5.draw(maze, "5")
+        tail_4.draw(maze, "4")
+        tail_3.draw(maze, "3")
+        tail_2.draw(maze, "2")
+        tail_1.draw(maze, "1")
         head.draw(maze, HEAD)
 
-        trail[tail.index()] = True
+        trail[tail_9.index()] = True
 
         print_maze(True, False)
 
