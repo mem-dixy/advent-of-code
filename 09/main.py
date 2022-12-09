@@ -206,8 +206,12 @@ for line in lines:
         maze[tail_index] = HEAD if maze[tail_index] == BOTH else EMPTY
         maze[tail_goto] = BOTH if maze[tail_goto] == HEAD else TAIL
 
+        trail[tail_goto] = True
 
-print_maze(True, True)
+        # print_maze(True, False)
+
+
+# print_maze(False, True)
 print_visited()
 # all touching
 # ***
