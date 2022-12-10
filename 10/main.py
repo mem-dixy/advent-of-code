@@ -1,31 +1,6 @@
 import io
 
-grid = []
-forest = []
-scores = []
-# 0 min 9 max
-# 1 min 10 max
-
-import enum
-import dataclasses
-import types
-import typing
-
-
-EMPTY = "."
-VISITED = "#"
-
-HEAD = "H"
-TAIL = "T"
-BOTH = "S"
-
-DOWN = "D"
-LEFT = "L"
-RIGHT = "R"
-UP = "U"
-
-def parse_input(
-) -> list[str]:
+def parse_input():
     lines = []
     with open("input.txt") as file:
         readlines = file.readlines()
@@ -67,6 +42,8 @@ class Nothing(Instruction):
         pass
 
 
+screen = []
+
 
 instruction = None
 clock = 1
@@ -75,9 +52,6 @@ strength = 0
 
 lines = parse_input()
 for line in lines:
-    if clock > 217:
-        pass
-
     # start of idle state
     match line:
         case ["addx", value]:
@@ -89,16 +63,34 @@ for line in lines:
     while wait:
         # start of busy cycle
 
+
         if clock % 40 == 20:
             signal = clock * register_x
             strength += signal
             print(signal)
+
+        offset = clock - 1
+        position = offset % 40
+        value = abs(register_x - position)
+        test = value <= 1
+        screen.append(test)
 
         # end of cycle
         wait = instruction.tick()
         clock += 1
     # goto idle state
 
-
-print("final")
 print(strength)
+
+
+width = 40
+height = 6
+string = io.StringIO()
+for index_y in range(height):
+    for index_x in range(width):
+        index = index_y * width + index_x
+        draw = "#" if screen[index] else "."
+        string.write(draw)
+    string.write("\n")
+
+print(string.getvalue())
