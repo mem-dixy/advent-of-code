@@ -71,16 +71,34 @@ class Nothing(Instruction):
 instruction = None
 clock = 1
 register_x = 1
+strength = 0
 
 lines = parse_input()
 for line in lines:
+    if clock > 217:
+        pass
+
+    # start of idle state
     match line:
         case ["addx", value]:
             instruction = Add(value)
         case ["noop"]:
             instruction = Nothing()
 
-    while instruction.tick():
-        clock += 1
+    wait = True
+    while wait:
+        # start of busy cycle
 
-    clock += 1
+        if clock % 40 == 20:
+            signal = clock * register_x
+            strength += signal
+            print(signal)
+
+        # end of cycle
+        wait = instruction.tick()
+        clock += 1
+    # goto idle state
+
+
+print("final")
+print(strength)
