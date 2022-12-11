@@ -31,6 +31,7 @@ class Monkey():
     test_divisible_by: int
     if_true_throw_to_monkey: int
     if_false_throw_to_monkey: int
+    inspected_items: int
 
     def __init__(self, line):
         self.monkey = int(line[0].split()[-1].split(":")[0])
@@ -47,6 +48,8 @@ class Monkey():
         self.if_true_throw_to_monkey = int(line[4].split()[-1])
         self.if_false_throw_to_monkey = int(line[5].split()[-1])
 
+        self.inspected_items = 0
+
     def catch(self, items):
         self.starting_items.extend(items)
 
@@ -54,6 +57,8 @@ class Monkey():
         true_monkey = []
         false_monkey = []
         for item in self.starting_items:
+
+            self.inspected_items += 1
 
             if self.operation_value:
                 value = self.operation_value
@@ -92,7 +97,31 @@ def play_round():
         monkeys[slot_f].catch(list_f)
     for monkey in monkeys:
         print(monkey)
+    print(monkey)
+    print()
 
 
-play_round()
+rounds = 20
+for round in range(1, rounds + 1, 1):
+    print(F"After round {round},", end="")
+    print(" the monkeys are holding items with these worry levels:")
+    play_round()
 
+
+for monkey in monkeys:
+    index = monkey.monkey
+    times = monkey.inspected_items
+    print(F"Monkey {index} inspected items {times} times.")
+
+def monkey_business():
+    array = []
+    for monkey in monkeys:
+        array.append(monkey.inspected_items)
+    array.sort()
+    array.reverse()
+    (one, two) = array[0:2]
+    result = one * two
+    print()
+    print(result)
+
+monkey_business()
