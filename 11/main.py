@@ -37,7 +37,6 @@ class Monkey():
 
         items = line[1].split()[2:]
         self.starting_items = [int(item.split(",")[0]) for item in items]
-        self.starting_items.sort()
 
         self.operation_type_addition = line[2].split()[-2] == "+"
 
@@ -48,19 +47,52 @@ class Monkey():
         self.if_true_throw_to_monkey = int(line[4].split()[-1])
         self.if_false_throw_to_monkey = int(line[5].split()[-1])
 
-        self.value = 0
+    def catch(self, items):
+        self.starting_items.extend(items)
 
-    def operation(self):
-        if self.operation_value:
-            value = self.operation_value
-        else:
-            value = self.value
+    def take_turn(self):
+        true_monkey = []
+        false_monkey = []
+        for item in self.starting_items:
 
-        if self.operation_type_addition:
-            self.value = self.value + value
-        else:
-            self.value = self.value * value
+            if self.operation_value:
+                value = self.operation_value
+            else:
+                value = item
+
+            if self.operation_type_addition:
+                item = item + value
+            else:
+                item = item * value
+
+            item = item // 3  # relief
+
+            if item % self.test_divisible_by == 0:
+                true_monkey.append(item)
+            else:
+                false_monkey.append(item)
+
+        self.starting_items = []
+        return (
+            (self.if_true_throw_to_monkey, true_monkey),
+            (self.if_false_throw_to_monkey, false_monkey),
+        )
+
+    def __str__(self):
+        array = str(self.starting_items)[1:-1]
+        return F"Monkey {self.monkey}: {array}"
 
 
 monkeys = input()
+
+def play_round():
+    for monkey in monkeys:
+        ((slot_t, list_t), (slot_f, list_f)) = monkey.take_turn()
+        monkeys[slot_t].catch(list_t)
+        monkeys[slot_f].catch(list_f)
+    for monkey in monkeys:
+        print(monkey)
+
+
+play_round()
 
