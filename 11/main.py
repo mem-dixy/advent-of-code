@@ -1,7 +1,5 @@
 import io
 
-OPTIMAL_LIST_SIZE = 36
-
 def input_read():
     string = io.StringIO()
     with open("input.txt") as file:
@@ -23,7 +21,13 @@ def input_parse(lines):
 
 def input():
     string = input_read()
-    return input_parse(string)
+    monkeys = input_parse(string)
+    factor = 1
+    for monkey in monkeys:
+        factor *= monkey.test_divisible_by
+    for monkey in monkeys:
+        monkey.factor = factor
+    return monkeys
 
 class Monkey():
     monkey: int
@@ -35,18 +39,13 @@ class Monkey():
     if_false_throw_to_monkey: int
     inspected_items: int
 
-    index: int
+    factor: int
 
     def __init__(self, line):
         self.monkey = int(line[0].split()[-1].split(":")[0])
 
         items = line[1].split()[2:]
-        starting_items = [int(item.split(",")[0]) for item in items]
-        self.starting_items = [None] * OPTIMAL_LIST_SIZE
-        self.index = 0
-        for stuff in starting_items:
-            self.starting_items[self.index] = stuff
-            self.index += 1
+        self.starting_items = [int(item.split(",")[0]) for item in items]
 
         self.operation_type_addition = line[2].split()[-2] == "+"
 
@@ -59,19 +58,13 @@ class Monkey():
 
         self.inspected_items = 0
 
-    def catch(self, item):
-        self.starting_items[self.index] = item
-        self.index += 1
+    def catch(self, items):
+        self.starting_items.extend(items)
 
     def take_turn(self):
-        global monkeys
-
-        index = 0
-        item = self.starting_items[index]
-        while item:
-
-            if item is None:
-                return
+        true_monkey = []
+        false_monkey = []
+        for item in self.starting_items:
 
             self.inspected_items += 1
 
@@ -85,20 +78,21 @@ class Monkey():
             else:
                 item = item * value
 
+            item %= self.factor
+
             item = item // 3  # relief
 
+
             if item % self.test_divisible_by == 0:
-                monkeys[self.if_true_throw_to_monkey].catch(item)
+                true_monkey.append(item)
             else:
-                monkeys[self.if_false_throw_to_monkey].catch(item)
+                false_monkey.append(item)
 
-            index += 1
-            item = self.starting_items[index]
-
-
-        for index in range(OPTIMAL_LIST_SIZE):
-            self.starting_items[index] = None
-        self.index = 0
+        self.starting_items = []
+        return (
+            (self.if_true_throw_to_monkey, true_monkey),
+            (self.if_false_throw_to_monkey, false_monkey),
+        )
 
     def __str__(self):
         array = str(self.starting_items)[1:-1]
@@ -109,37 +103,22 @@ monkeys = input()
 
 
 
-def play_round(round):
+def play_round():
     for monkey in monkeys:
-        monkey.take_turn()
-    if round % 1000 == -1:
-        pass
-    else:
-
-        for monkey in monkeys:
-            print(monkey)
+        ((slot_t, list_t), (slot_f, list_f)) = monkey.take_turn()
+        monkeys[slot_t].catch(list_t)
+        monkeys[slot_f].catch(list_f)
+    for monkey in monkeys:
         print(monkey)
-        print()
+    print(monkey)
+    print()
 
-
-
-def optimize():
-    total = []
-    for monkey in monkeys:
-        total.extend(monkey.starting_items)
-
-    print(len(total))
-
-# optimize()
 
 rounds = 20
 for round in range(1, rounds + 1, 1):
-    if round % 1000 == -1:
-        pass
-    else:
-        print(F"After round {round},", end="")
-        print(" the monkeys are holding items with these worry levels:")
-    play_round(round)
+    print(F"After round {round},", end="")
+    print(" the monkeys are holding items with these worry levels:")
+    play_round()
 
 
 for monkey in monkeys:
