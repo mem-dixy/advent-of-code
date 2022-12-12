@@ -10,10 +10,12 @@ def input_read():
 
 def input_parse(lines):
     monkeys = []
+    factor = 1 * 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23 * 29
     for line in lines:
         monkeys.append(
             Monkey(
-                [item.strip() for item in line.split("\n") if item]
+                [item.strip() for item in line.split("\n") if item],
+                factor,
             )
         )
     return monkeys
@@ -21,13 +23,7 @@ def input_parse(lines):
 
 def input():
     string = input_read()
-    monkeys = input_parse(string)
-    factor = 1
-    for monkey in monkeys:
-        factor *= monkey.test_divisible_by
-    for monkey in monkeys:
-        monkey.factor = factor
-    return monkeys
+    return input_parse(string)
 
 class Monkey():
     monkey: int
@@ -41,7 +37,9 @@ class Monkey():
 
     factor: int
 
-    def __init__(self, line):
+    def __init__(self, line, factor):
+        self.factor = factor
+
         self.monkey = int(line[0].split()[-1].split(":")[0])
 
         items = line[1].split()[2:]
@@ -80,9 +78,6 @@ class Monkey():
 
             item %= self.factor
 
-            item = item // 3  # relief
-
-
             if item % self.test_divisible_by == 0:
                 true_monkey.append(item)
             else:
@@ -108,16 +103,10 @@ def play_round():
         ((slot_t, list_t), (slot_f, list_f)) = monkey.take_turn()
         monkeys[slot_t].catch(list_t)
         monkeys[slot_f].catch(list_f)
-    for monkey in monkeys:
-        print(monkey)
-    print(monkey)
-    print()
 
 
-rounds = 20
+rounds = 10000
 for round in range(1, rounds + 1, 1):
-    print(F"After round {round},", end="")
-    print(" the monkeys are holding items with these worry levels:")
     play_round()
 
 
@@ -138,3 +127,5 @@ def monkey_business():
     print(result)
 
 monkey_business()
+
+
