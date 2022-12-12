@@ -58,11 +58,23 @@ class Axis():
 
         return 0 <= self.point < self.size
 
+    def __eq__(
+        self,
+        other: typing.Self,
+    ) -> bool:
+        """"""
+
+        point = self.point == other.point
+        size = self.size == other.size
+        return point and size
+
     def __init__(
         self,
         point: int,
         size: int,
     ) -> None:
+        """"""
+
         self.point = point
         self.size = size
 
@@ -107,9 +119,9 @@ class Grid():
             case Direction.EAST:
                 self.axis_x.move(+1)
             case Direction.NORTH:
-                self.axis_x.move(-self.axis_x.size)
-            case Direction.EAST:
-                self.axis_x.move(+self.axis_x.size)
+                self.axis_y.move(-1)
+            case Direction.SOUTH:
+                self.axis_y.move(+1)
             case Direction.WEST:
                 self.axis_x.move(-1)
 
@@ -119,6 +131,16 @@ class Grid():
         """"""
 
         return self.axis_x.valid() and self.axis_y.valid()
+
+    def __eq__(
+        self,
+        other: typing.Self,
+    ) -> bool:
+        """"""
+
+        axis_x = self.axis_x == other.axis_x
+        axis_y = self.axis_y == other.axis_y
+        return axis_x and axis_y
 
     def __init__(
         self,
@@ -173,8 +195,26 @@ class Cell():
 
         return self.grid.valid()
 
+    def __eq__(
+        self,
+        other: typing.Self,
+    ) -> bool:
+        """"""
+
+        return self.grid == other.grid
+
     def __init__(self, grid):
         self.grid = grid
+
+    def __str__(
+        self,
+    ) -> str:
+        """"""
+
+        index_x = self.grid.axis_x.point
+        index_y = self.grid.axis_y.point
+        return F"({index_x}, {index_y})"
+
 
     @classmethod
     def from_index(
@@ -260,6 +300,12 @@ class Maze():
                 cell.goto(index_x, index_y)
                 index = cell.grid.index()
                 draw = self.draw[index]
-                string.write(str(draw))
+                # string.write(str(draw))
+                if draw < 10:
+                    string.write(F"[00{draw}]")
+                elif draw < 100:
+                    string.write(F"[0{draw}]")
+                elif draw < 1000:
+                    string.write(F"[{draw}]")
             string.write("\n")
         return string.getvalue()

@@ -8,6 +8,8 @@ from maze import Cell
 from maze import Maze
 
 
+CLIMB_LIMIT = 1
+INFINITY = 1234567890
 
 def elevation(letter):
     if letter == "S":
@@ -35,14 +37,22 @@ class Hill(Maze):
         heightmap = [elevation(item) for item in data_lookup]
         size = len(heightmap)
 
-        self.distance = [None] * size
+        self.distance = [INFINITY] * size
         self.distance[self.player.grid.index()] = 0
 
         self.draw = data_lookup
         self.draw = self.distance
 
 
-CLIMB_LIMIT = 1
+    def __str__(
+        self,
+    ) -> str:
+        """"""
+
+        self.draw = self.distance
+        return super().__str__()
+
+
 
 def climbable(here, goto):
     return here + CLIMB_LIMIT <= goto
@@ -53,15 +63,33 @@ with open("input.txt") as file:
     maze = Hill(data)
 
 
+def happy_neighboar(neighboar):
+    distance = INFINITY
+    for boar in neighboar:
+        distance = min(distance, maze.distance[boar.index()])
+    return distance
+
+for index_y in range(5):
+    for index_x in range(8):
+        cell = Cell.clone(maze.player)
+        cell.goto(index_x, index_y)
+        if cell == maze.player:
+            continue
+
+        neighbor = cell.neighbor()
+        distance = happy_neighboar(neighbor)
+
+        chek = cell.index()
+        maze.distance[cell.index()] = distance + 1
 
 print(maze)
+
 
 size = 1
 for round in range(size):
     player = Cell.clone(maze.player)
     neighbor = player.neighbor()
     for dog in neighbor:
-        maze.distance[dog.index()] = 2
+        print(dog)
 
-    pass
-
+print(maze)
