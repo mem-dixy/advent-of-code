@@ -29,15 +29,17 @@ class Hill(Maze):
 
         data_lookup = [item for item in data if item.isalpha()]
 
-        self.start = Cell.from_index(self.grid, data_lookup.index("S"))
+        self.player = Cell.from_index(self.grid, data_lookup.index("S"))
         self.finish = Cell.from_index(self.grid, data_lookup.index("E"))
 
         heightmap = [elevation(item) for item in data_lookup]
         size = len(heightmap)
-        distance = [None] * size
-        distance[self.start.grid.index()] = 0
+
+        self.distance = [None] * size
+        self.distance[self.player.grid.index()] = 0
 
         self.draw = data_lookup
+        self.draw = self.distance
 
 
 CLIMB_LIMIT = 1
@@ -56,5 +58,10 @@ print(maze)
 
 size = 1
 for round in range(size):
+    player = Cell.clone(maze.player)
+    neighbor = player.neighbor()
+    for dog in neighbor:
+        maze.distance[dog.index()] = 2
+
     pass
 
