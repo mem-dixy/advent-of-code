@@ -5,7 +5,7 @@ import enum
 import typing
 import types
 
-from input import demo as array
+from input import array
 
 def value_type(value):
     return str(type(value))
@@ -59,7 +59,9 @@ for turn in range(size):
     for index in range(0, size - turn, 1):
         left = array[index + 0]
         right = array[index + 1]
-        compare(left, right)
+        if not compare(left, right):
+            array[index + 1] = left
+            array[index + 0] = right
 
 
 
