@@ -5,7 +5,7 @@ import enum
 import typing
 import types
 
-from input import finished as array
+from input import demo as array
 
 def value_type(value):
     return str(type(value))
@@ -53,6 +53,16 @@ def compare(left, right):
             return False
     return None
 
+
+size = len(array) - 1
+for turn in range(size):
+    for index in range(0, size - turn, 1):
+        left = array[index + 0]
+        right = array[index + 1]
+        compare(left, right)
+
+
+
 divider_top = [[2]]
 divider_bottom = [[6]]
 
@@ -60,20 +70,14 @@ index = 1
 index_top = 0
 index_bottom = 0
 for item in array:
+    cat = str(item)
+    dog = str(divider_bottom)
+    fromo = str(divider_top)
     if str(item) == str(divider_top):
-        divider_top = index
+        index_top = index
     if str(item) == str(divider_bottom):
-        divider_bottom = index
+        index_bottom = index
     index += 1
 
-print(index_top)
-print(index_bottom)
-
-for item in array:
-    if compare(*item):
-        result.append(index)
-    index += 1
-
-print(result)
-final = sum(result)
-print(final)
+index_code = index_top * index_bottom
+print(F"{index_top} * {index_bottom} = {index_code}")
