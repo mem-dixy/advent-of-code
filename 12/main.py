@@ -37,8 +37,13 @@ class Hill(Maze):
         heightmap = [elevation(item) for item in data_lookup]
         size = len(heightmap)
 
+        start = self.player.grid.index()
+
         self.distance = [INFINITY] * size
-        self.distance[self.player.grid.index()] = 0
+        self.distance[start] = 0
+
+        self.visited = [None] * size
+        self.visited[start] = False
 
         self.draw = data_lookup
         self.draw = self.distance
@@ -64,32 +69,41 @@ with open("input.txt") as file:
 
 
 def happy_neighboar(neighboar):
+    neigh = boar.index()
+
+    maze.distance[neigh] = distance + 1
+    maze.visited[neigh] = False
+
+    array.append(boar)
+
     distance = INFINITY
     for boar in neighboar:
         distance = min(distance, maze.distance[boar.index()])
     return distance
 
-for index_y in range(5):
-    for index_x in range(8):
-        cell = Cell.clone(maze.player)
-        cell.goto(index_x, index_y)
-        if cell == maze.player:
+
+array = []
+array.append(Cell.clone(maze.player))
+while array:
+    cell = array.pop(0)
+    index = cell.index()
+
+    distance = maze.distance[index]
+    maze.visited[index] = True
+
+
+
+    for boar in cell.neighbor():
+        neigh = boar.index()
+
+        if maze.visited[neigh] is not None:
             continue
 
-        neighbor = cell.neighbor()
-        distance = happy_neighboar(neighbor)
+        maze.distance[neigh] = distance + 1
+        maze.visited[neigh] = False
 
-        chek = cell.index()
-        maze.distance[cell.index()] = distance + 1
-
-print(maze)
+        array.append(boar)
 
 
-size = 1
-for round in range(size):
-    player = Cell.clone(maze.player)
-    neighbor = player.neighbor()
-    for dog in neighbor:
-        print(dog)
 
 print(maze)
