@@ -49,7 +49,7 @@ def compare(left, right):
         case _:
             print("FAIL")
             return False
-    return True
+    return None
 
 for item in array:
     if compare(*item):
