@@ -1,9 +1,11 @@
+
+
 import io
 import enum
 import typing
 import types
 
-from input import array
+from input import finished as array
 
 def value_type(value):
     return str(type(value))
@@ -50,6 +52,22 @@ def compare(left, right):
             print("FAIL")
             return False
     return None
+
+divider_top = [[2]]
+divider_bottom = [[6]]
+
+index = 1
+index_top = 0
+index_bottom = 0
+for item in array:
+    if str(item) == str(divider_top):
+        divider_top = index
+    if str(item) == str(divider_bottom):
+        divider_bottom = index
+    index += 1
+
+print(index_top)
+print(index_bottom)
 
 for item in array:
     if compare(*item):
