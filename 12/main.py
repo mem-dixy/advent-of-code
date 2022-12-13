@@ -37,6 +37,8 @@ class Hill(Maze):
         heightmap = [elevation(item) for item in data_lookup]
         size = len(heightmap)
 
+        self.slope = heightmap
+
         start = self.player.grid.index()
 
         self.distance = [INFINITY] * size
@@ -88,15 +90,18 @@ while array:
     cell = array.pop(0)
     index = cell.index()
 
+    slope = maze.slope[index]
     distance = maze.distance[index]
+
     maze.visited[index] = True
-
-
 
     for boar in cell.neighbor():
         neigh = boar.index()
 
         if maze.visited[neigh] is not None:
+            continue
+
+        if slope + CLIMB_LIMIT < maze.slope[neigh]:
             continue
 
         maze.distance[neigh] = distance + 1
@@ -107,3 +112,6 @@ while array:
 
 
 print(maze)
+
+goal = maze.finish.index()
+print(maze.distance[goal])
