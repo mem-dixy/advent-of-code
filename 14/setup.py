@@ -9,11 +9,12 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-FILE = "sample.txt"
+# FILE = "sample.txt"
 
 
-AIR = "&"
-ROCK = "$"
+AIR = "."
+ROCK = "#"
+SAND = "+"
 
 
 class Point():
@@ -33,8 +34,8 @@ class Cave(Maze):
 
         (size, min_x, max_x, min_y, max_y) = bounds
 
-        width = max_x - min_x
-        height = max_y - min_y
+        width = 1 + max_x - min_x
+        height = 1 + max_y - min_y
         size = width * height
 
         super().__init__(width, height)
@@ -45,6 +46,7 @@ class Cave(Maze):
         self.visited = [None] * size
 
         self.draw = [AIR] * size
+        self.draw[self.sand.index()] = SAND
 
     def paint(self, rock):
         for dirt in rock:
@@ -115,7 +117,7 @@ def map_bounds(rock, sand):
 def point_invert(point, bounds):
     (size, min_x, max_x, min_y, max_y) = bounds
     point.index_x -= min_x
-    point.index_y = max_y - point.index_y - min_y
+    point.index_y -= min_y
     return point
 
 
