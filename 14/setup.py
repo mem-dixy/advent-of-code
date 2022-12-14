@@ -11,10 +11,11 @@ ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
 # FILE = "sample.txt"
 
-
-AIR = "."
+ROOM = "."
 ROCK = "#"
-SAND = "+"
+DROP = "+"
+SAND = "o"
+FLOW = "~"
 
 
 class Point():
@@ -32,10 +33,10 @@ class Point():
 class Cave(Maze):
     def __init__(self, bounds, sand):
 
-        (size, min_x, max_x, min_y, max_y) = bounds
+        (min_x, max_x, min_y, max_y) = bounds
 
-        width = 1 + max_x - min_x
-        height = 1 + max_y - min_y
+        width = 3 + max_x - min_x
+        height = 3 + max_y - min_y
         size = width * height
 
         super().__init__(width, height)
@@ -45,8 +46,8 @@ class Cave(Maze):
 
         self.visited = [None] * size
 
-        self.draw = [AIR] * size
-        self.draw[self.sand.index()] = SAND
+        self.draw = [ROOM] * size
+        self.draw[self.sand.index()] = DROP
 
     def paint(self, rock):
         for dirt in rock:
@@ -108,31 +109,28 @@ def map_bounds(rock, sand):
             min_y = min(min_y, index_y)
             max_x = max(max_x, index_x)
             max_y = max(max_y, index_y)
-    size_x = max_x - min_x
-    size_y = max_y - min_y
-    size = max(size_x, size_y) + 2
-    return (size, min_x, max_x, min_y, max_y)
+    return (min_x, max_x, min_y, max_y)
 
 
-def point_invert(point, bounds):
-    (size, min_x, max_x, min_y, max_y) = bounds
-    point.index_x -= min_x
-    point.index_y -= min_y
+def point_resize(point, bounds):
+    (min_x, max_x, min_y, max_y) = bounds
+    point.index_x = 1 + point.index_x - min_x
+    point.index_y = 1 + point.index_y - min_y
     return point
 
 
-def map_invert(rock, bounds):
+def map_resize(rock, bounds):
     for dirt in rock:
         for item in dirt:
-            point_invert(item, bounds)
+            point_resize(item, bounds)
     return rock
 
 
 def load(sand):
     rock = map_scan()
     bounds = map_bounds(rock, sand)
-    rock = map_invert(rock, bounds)
-    sand = point_invert(sand, bounds)
+    rock = map_resize(rock, bounds)
+    sand = point_resize(sand, bounds)
     cave = Cave(bounds, sand)
     cave.paint(rock)
     return cave
