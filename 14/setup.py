@@ -1,10 +1,3 @@
-
-
-import io
-import enum
-import typing
-import types
-
 NONE = str()
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
@@ -15,8 +8,9 @@ GREATER_THAN_SIGN = chr(0x003E)
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
 # FILE = "sample.txt"
-INFINITY = 9876543210
 
+from maze import Maze
+from maze import Cell
 
 class Point():
     def __init__(self, index_x, index_y):
@@ -30,10 +24,37 @@ class Point():
         return F"({self.index_x}, {self.index_y})"
 
 
-sand = Point(500, 0)
 
-def scan_cave():
-    done = []
+
+class Cave(Maze):
+    def __init__(self, bounds, sand):
+
+        (size, min_x, max_x, min_y, max_y) = bounds
+
+        width = max_x
+        height = max_y
+        size = width * height
+
+        super().__init__(width, height)
+
+        self.sand = Cell(self.grid)
+        self.sand.goto(sand.index_x, sand.index_y)
+
+        self.visited = [None] * size
+
+        self.draw = ["X"] * size
+
+
+    def __str__(
+        self,
+    ) -> str:
+        """"""
+
+        return super().__str__()
+
+
+def map_scan():
+    rock = []
     with open(FILE) as file:
         read = file.read().strip()
         data = read.split(LINE_FEED)
@@ -45,8 +66,8 @@ def scan_cave():
                 value = item.split(COMMA)
                 point = Point(*value)
                 row.append(point)
-            done.append(row)
-    return done
+            rock.append(row)
+    return rock
 
 def map_bounds(rock, sand):
     min_x = sand.index_x
@@ -66,16 +87,23 @@ def map_bounds(rock, sand):
     size = max(size_x, size_y) + 2
     return (size, min_x, max_x, min_y, max_y)
 
-rock = scan_cave()
-print(rock)
+def point_invert(point, bounds):
+    (size, min_x, max_x, min_y, max_y) = bounds
+    point.index_x -= min_x
+    point.index_y = max_y - point.index_y - min_y
+    return point
 
+def map_invert(rock, bounds):
+    (size, min_x, max_x, min_y, max_y) = bounds
+    for dirt in rock:
+        for item in dirt:
+            point_invert(item, bounds)
+    return rock
 
-bounds = map_bounds(rock, sand)
-size = bounds
-def map_display(rocks):
-    string = io.StringIO()
-    for index_y in range(size):
-        for index_x in range(size):
-            string.write("x")
-        string.write(LINE_FEED)
-    print(string.getvalue())
+def load(sand):
+    rock = map_scan()
+    bounds = map_bounds(rock, sand)
+    rock = map_invert(rock, bounds)
+    sand = point_invert(sand, bounds)
+    cave = Cave(bounds, sand)
+    return cave

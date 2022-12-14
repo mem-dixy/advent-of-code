@@ -204,7 +204,7 @@ class Cell():
         return self.grid == other.grid
 
     def __init__(self, grid):
-        self.grid = grid
+        self.grid = grid.clone()
 
     def __str__(
         self,
@@ -218,6 +218,25 @@ class Cell():
 
     @classmethod
     def from_index(
+        cls,
+        grid: Grid,
+        index: int,
+    ):
+        """"""
+
+        width = grid.axis_x.size
+        height = grid.axis_y.size
+        index_x = index % width
+        index_y = index // width
+        return cls(
+            Grid(
+                Axis(index_x, width),
+                Axis(index_y, height),
+            )
+        )
+
+    @classmethod
+    def from_raw(
         cls,
         grid: Grid,
         index: int,
@@ -300,12 +319,6 @@ class Maze():
                 cell.goto(index_x, index_y)
                 index = cell.grid.index()
                 draw = self.draw[index]
-                # string.write(str(draw))
-                if draw < 10:
-                    string.write(F"[00{draw}]")
-                elif draw < 100:
-                    string.write(F"[0{draw}]")
-                elif draw < 1000:
-                    string.write(F"[{draw}]")
+                string.write(draw)
             string.write("\n")
         return string.getvalue()

@@ -300,12 +300,6 @@ class Maze():
                 cell.goto(index_x, index_y)
                 index = cell.grid.index()
                 draw = self.draw[index]
-                # string.write(str(draw))
-                if draw < 10:
-                    string.write(F"[00{draw}]")
-                elif draw < 100:
-                    string.write(F"[0{draw}]")
-                elif draw < 1000:
-                    string.write(F"[{draw}]")
+                string.write(draw)
             string.write("\n")
         return string.getvalue()
