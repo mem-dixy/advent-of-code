@@ -18,6 +18,7 @@ class Direction(enum.Enum):
     NORTHWEST = enum.auto()
 
 
+
 class Axis():
     """"""
 
@@ -273,6 +274,7 @@ class Cell():
     ) -> Direction:
         """"""
 
+
         north = self.grid.axis_y.point > cell.grid.axis_y.point
         east = self.grid.axis_x.point < cell.grid.axis_x.point
         south = self.grid.axis_y.point < cell.grid.axis_y.point
@@ -282,6 +284,7 @@ class Cell():
         southeast = south and east
         southwest = south and west
         northwest = south and west
+
 
         if northeast:
             return Direction.NORTHEAST
@@ -303,6 +306,7 @@ class Cell():
         return None
 
     @classmethod
+
     @classmethod
     def from_raw(
         cls,

@@ -1,4 +1,3 @@
-from maze import Direction
 from maze import Cell
 from maze import Maze
 NONE = str()
@@ -10,7 +9,7 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
 ROOM = "."
 ROCK = "#"
@@ -18,6 +17,7 @@ DROP = "+"
 SAND = "o"
 FLOW = "~"
 
+from maze import Direction
 
 class Point():
     def __init__(self, index_x, index_y):
@@ -51,21 +51,14 @@ class Cave(Maze):
         self.draw[self.sand.index()] = DROP
 
         self.valid = [True] * size
-        self.valid[self.sand.index()] = None
         for index in range(size):
             cell = Cell.from_index(self.grid, index)
-
-            g = cell.grid.axis_y.point == cell.grid.axis_y.size - 2
-
             a = cell.grid.axis_x.point <= 0
             b = cell.grid.axis_x.point >= cell.grid.axis_x.size - 1
             d = cell.grid.axis_y.point <= 0
             e = cell.grid.axis_y.point >= cell.grid.axis_y.size - 1
             if a or b or d or e:
                 self.valid[cell.index()] = False
-            if g and not a and not b:
-                self.data[cell.index()] = True
-                self.draw[cell.index()] = ROCK
 
     def paint(self, rock):
         for dirt in rock:
@@ -113,6 +106,7 @@ class Cave(Maze):
             cell = point.clone()
             cell.move(direction)
             collisions.append(self.data[cell.index()])
+
 
         return collisions
 
@@ -183,15 +177,6 @@ def map_bounds(rock, sand):
             min_y = min(min_y, index_y)
             max_x = max(max_x, index_x)
             max_y = max(max_y, index_y)
-
-    min_y += 0
-    max_y += 2
-
-    tall = max_y - min_y
-
-    min_x = min(min_x, sand.index_x - tall)
-    max_x = max(max_x, sand.index_x + tall)
-
     return (min_x, max_x, min_y, max_y)
 
 

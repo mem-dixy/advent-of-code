@@ -12,9 +12,8 @@ sand = Point(500, 0)
 cave = load(sand)
 
 
-
 count = 0
-while False:
+while True:
     cell = cave.sand.clone()
     falling = True
     while falling:
@@ -22,8 +21,6 @@ while False:
     if falling is False:
         break
     count += 1
-    if cell == cave.sand:
-        break
 
 print(cave)
 
