@@ -1,3 +1,5 @@
+from maze import Cell
+from maze import Maze
 NONE = str()
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
@@ -7,10 +9,12 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
-from maze import Maze
-from maze import Cell
+
+AIR = "&"
+ROCK = "$"
+
 
 class Point():
     def __init__(self, index_x, index_y):
@@ -24,15 +28,13 @@ class Point():
         return F"({self.index_x}, {self.index_y})"
 
 
-
-
 class Cave(Maze):
     def __init__(self, bounds, sand):
 
         (size, min_x, max_x, min_y, max_y) = bounds
 
-        width = max_x
-        height = max_y
+        width = max_x - min_x
+        height = max_y - min_y
         size = width * height
 
         super().__init__(width, height)
@@ -42,8 +44,29 @@ class Cave(Maze):
 
         self.visited = [None] * size
 
-        self.draw = ["X"] * size
+        self.draw = [AIR] * size
 
+    def paint(self, rock):
+        for dirt in rock:
+            start = None
+            finish = None
+            first = True
+            for item in dirt:
+                if first:
+                    first = False
+                    start = self.sand.clone()
+                    start.goto(item.index_x, item.index_y)
+                    self.draw[start.index()] = ROCK
+                else:
+                    finish = self.sand.clone()
+                    finish.goto(item.index_x, item.index_y)
+                    self.draw[finish.index()] = ROCK
+
+                    direction = start.face(finish)
+                    while direction:
+                        start.move(direction)
+                        direction = start.face(finish)
+                        self.draw[start.index()] = ROCK
 
     def __str__(
         self,
@@ -69,6 +92,7 @@ def map_scan():
             rock.append(row)
     return rock
 
+
 def map_bounds(rock, sand):
     min_x = sand.index_x
     min_y = sand.index_y
@@ -87,18 +111,20 @@ def map_bounds(rock, sand):
     size = max(size_x, size_y) + 2
     return (size, min_x, max_x, min_y, max_y)
 
+
 def point_invert(point, bounds):
     (size, min_x, max_x, min_y, max_y) = bounds
     point.index_x -= min_x
     point.index_y = max_y - point.index_y - min_y
     return point
 
+
 def map_invert(rock, bounds):
-    (size, min_x, max_x, min_y, max_y) = bounds
     for dirt in rock:
         for item in dirt:
             point_invert(item, bounds)
     return rock
+
 
 def load(sand):
     rock = map_scan()
@@ -106,4 +132,5 @@ def load(sand):
     rock = map_invert(rock, bounds)
     sand = point_invert(sand, bounds)
     cave = Cave(bounds, sand)
+    cave.paint(rock)
     return cave

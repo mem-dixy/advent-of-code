@@ -215,7 +215,6 @@ class Cell():
         index_y = self.grid.axis_y.point
         return F"({index_x}, {index_y})"
 
-
     @classmethod
     def from_index(
         cls,
@@ -234,6 +233,23 @@ class Cell():
                 Axis(index_y, height),
             )
         )
+
+    def face(
+        self,
+        cell: typing.Self,
+    ) -> Direction:
+        """"""
+
+        if self.grid.axis_x.point < cell.grid.axis_x.point:
+            return Direction.EAST
+        if self.grid.axis_y.point > cell.grid.axis_y.point:
+            return Direction.NORTH
+        if self.grid.axis_y.point < cell.grid.axis_y.point:
+            return Direction.SOUTH
+        if self.grid.axis_x.point > cell.grid.axis_x.point:
+            return Direction.WEST
+
+        return None
 
     @classmethod
     def from_raw(
