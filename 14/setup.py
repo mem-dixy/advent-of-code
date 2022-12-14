@@ -9,7 +9,7 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
 ROOM = "."
 ROCK = "#"
@@ -17,6 +17,7 @@ DROP = "+"
 SAND = "o"
 FLOW = "~"
 
+from maze import Direction
 
 class Point():
     def __init__(self, index_x, index_y):
@@ -44,10 +45,20 @@ class Cave(Maze):
         self.sand = Cell(self.grid)
         self.sand.goto(sand.index_x, sand.index_y)
 
-        self.visited = [None] * size
+        self.data = [None] * size
 
         self.draw = [ROOM] * size
         self.draw[self.sand.index()] = DROP
+
+        self.valid = [True] * size
+        for index in range(size):
+            cell = Cell.from_index(self.grid, index)
+            a = cell.grid.axis_x.point <= 0
+            b = cell.grid.axis_x.point >= cell.grid.axis_x.size - 1
+            d = cell.grid.axis_y.point <= 0
+            e = cell.grid.axis_y.point >= cell.grid.axis_y.size - 1
+            if a or b or d or e:
+                self.valid[cell.index()] = False
 
     def paint(self, rock):
         for dirt in rock:
@@ -59,17 +70,73 @@ class Cave(Maze):
                     first = False
                     start = self.sand.clone()
                     start.goto(item.index_x, item.index_y)
+                    self.data[start.index()] = True
                     self.draw[start.index()] = ROCK
                 else:
                     finish = self.sand.clone()
                     finish.goto(item.index_x, item.index_y)
+                    self.data[finish.index()] = True
                     self.draw[finish.index()] = ROCK
 
                     direction = start.face(finish)
                     while direction:
                         start.move(direction)
                         direction = start.face(finish)
+                        self.data[start.index()] = True
                         self.draw[start.index()] = ROCK
+
+    def collision(
+        self,
+        point: Cell
+    ) -> list[bool]:
+        """"""
+
+        collisions = []
+        directions = [
+            Direction.NORTH,
+            Direction.NORTHEAST,
+            Direction.EAST,
+            Direction.SOUTHEAST,
+            Direction.SOUTH,
+            Direction.SOUTHWEST,
+            Direction.WEST,
+            Direction.NORTHWEST,
+        ]
+        for direction in directions:
+            cell = point.clone()
+            cell.move(direction)
+            collisions.append(self.data[cell.index()])
+
+
+        return collisions
+
+    def fall(
+        self,
+        cell: Cell
+    ) -> Direction:
+        """"""
+
+        collisions = self.collision(cell)
+        # north = collisions[0]
+        # northeast = collisions[1]
+        # east = collisions[2]
+        southeast = collisions[3]
+        south = collisions[4]
+        southwest = collisions[5]
+        # west = collisions[6]
+        # northwest = collisions[7]
+
+        if south is None:
+            cell.move(Direction.SOUTH)
+        elif southwest is None:
+            cell.move(Direction.SOUTHWEST)
+        elif southeast is None:
+            cell.move(Direction.SOUTHEAST)
+        else:
+            self.draw[cell.index()] = SAND
+            return None
+
+        return self.valid[cell.index()]
 
     def __str__(
         self,

@@ -8,10 +8,15 @@ import typing
 class Direction(enum.Enum):
     """"""
 
-    EAST = enum.auto()
     NORTH = enum.auto()
+    NORTHEAST = enum.auto()
+    EAST = enum.auto()
+    SOUTHEAST = enum.auto()
     SOUTH = enum.auto()
+    SOUTHWEST = enum.auto()
     WEST = enum.auto()
+    NORTHWEST = enum.auto()
+
 
 
 class Axis():
@@ -116,14 +121,26 @@ class Grid():
         """"""
 
         match direction:
-            case Direction.EAST:
-                self.axis_x.move(+1)
             case Direction.NORTH:
                 self.axis_y.move(-1)
+            case Direction.NORTHEAST:
+                self.axis_x.move(+1)
+                self.axis_y.move(-1)
+            case Direction.EAST:
+                self.axis_x.move(+1)
+            case Direction.SOUTHEAST:
+                self.axis_x.move(+1)
+                self.axis_y.move(+1)
             case Direction.SOUTH:
+                self.axis_y.move(+1)
+            case Direction.SOUTHWEST:
+                self.axis_x.move(-1)
                 self.axis_y.move(+1)
             case Direction.WEST:
                 self.axis_x.move(-1)
+            case Direction.NORTHWEST:
+                self.axis_x.move(-1)
+                self.axis_y.move(-1)
 
     def valid(
         self,
@@ -250,6 +267,45 @@ class Cell():
             return Direction.WEST
 
         return None
+
+    def face_any(
+        self,
+        cell: typing.Self,
+    ) -> Direction:
+        """"""
+
+
+        north = self.grid.axis_y.point > cell.grid.axis_y.point
+        east = self.grid.axis_x.point < cell.grid.axis_x.point
+        south = self.grid.axis_y.point < cell.grid.axis_y.point
+        west = self.grid.axis_x.point > cell.grid.axis_x.point
+
+        northeast = north and east
+        southeast = south and east
+        southwest = south and west
+        northwest = south and west
+
+
+        if northeast:
+            return Direction.NORTHEAST
+        elif southeast:
+            return Direction.SOUTHEAST
+        elif southwest:
+            return Direction.SOUTHWEST
+        elif northwest:
+            return Direction.NORTHWEST
+        elif north:
+            return Direction.NORTH
+        elif east:
+            return Direction.EAST
+        elif south:
+            return Direction.SOUTH
+        elif west:
+            return Direction.WEST
+
+        return None
+
+    @classmethod
 
     @classmethod
     def from_raw(
