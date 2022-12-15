@@ -1,5 +1,3 @@
-import io
-
 SENSOR = "S"
 BEACON = "B"
 NETHER = "."
@@ -20,6 +18,11 @@ BEACON = "B"
 NETHER = "."
 SCANED = "#"
 
+offset = 5000000
+width = offset * 4
+
+find = 2000000
+# find = 9
 
 class Point():
     def __init__(self, index_x, index_y):
@@ -49,93 +52,40 @@ def map_scan():
     return (sensors, beacons)
 
 
-def map_bounds(points, move):
-    min_x = + INFINITY
-    min_y = + INFINITY
-    max_x = - INFINITY
-    max_y = - INFINITY
-    for point in points:
-        min_x = min(min_x, point.index_x)
-        min_y = min(min_y, point.index_y)
-        max_x = max(max_x, point.index_x)
-        max_y = max(max_y, point.index_y)
-    wide = 1 + abs(min_x) + abs(max_x)
-    tall = 1 + abs(min_y) + abs(max_y)
-    width = max(wide, tall + tall + tall + tall + 1)
-    height = tall
-    push = wide - max_x
-    lift = -move.index_y
-    return (width, height, push, lift)
 
 
-def point_resize(point, bounds):
-    (width, height, push, lift) = bounds
-    point.index_x += push
-    point.index_y += lift
-
-
-def map_resize(points, bounds):
-    for point in points:
-        point_resize(point, bounds)
-
-
-def load(point):
-    (sensors, beacons) = map_scan()
-    points = sensors + beacons
-    bounds = map_bounds(points, point)
-    map_resize(sensors, bounds)
-    map_resize(beacons, bounds)
-    point_resize(point, bounds)
-    return (sensors, beacons, bounds)
-
-
-(sensors, beacons, bounds) = load(Point(0, 2000000))
-# (sensors, beacons, bounds) = load(Point(0, 11))
-
-(width, height, push, lift) = bounds
 search = [NETHER] * width
 
 count = 0
 line = 0
+
+(sensors, beacons) = map_scan()
 friends = zip(sensors, beacons)
-for (sensor, beacon) in friends:
+for friend in friends:
+    (sensor, beacon) = friend
     line += 1
     distance_x = sensor.index_x - beacon.index_x
     distance_y = sensor.index_y - beacon.index_y
     length = abs(distance_x) + abs(distance_y)
-    span = length - abs(sensor.index_y)
+    span = length - abs(abs(sensor.index_y) - abs(find))
     if span >= 0:
         count = 0
-        start = max(sensor.index_x - span, 0)
-        haltt = min(sensor.index_x + span, width)
+        start = sensor.index_x - span
+        haltt = sensor.index_x + span
         for index in range(start, haltt + 1):
-            search[index] = SCANED
+            search[offset + index] = SCANED
             count += 1
-    if sensor.index_y == 0:
-        search[sensor.index_x] = SENSOR
-    if beacon.index_y == 0:
-        search[beacon.index_x] = BEACON
+    if sensor.index_y == find:
+        search[offset + sensor.index_x] = SENSOR
+    if beacon.index_y == find:
+        search[offset + beacon.index_x] = BEACON
 
 done = [item for item in search if item == SENSOR or item == SCANED]
 
-SENSOR = "S"
-BEACON = "B"
-NETHER = "."
-SCANED = "#"
-print(len([item for item in search if item == SENSOR]))
-print(len([item for item in search if item == BEACON]))
-print(len([item for item in search if item == NETHER]))
-print(len([item for item in search if item == SCANED]))
 count = len(done)
 print(count)
 
-# string = io.StringIO()
-# for item in search:
-#    string.write(item)
-# print(string.getvalue())
-# print("EXAMPLE INPUT")
-
-# 5108328
-
-# 5441371
-# - 2
+# 5108328 too low
+# 5441371 too low?
+# 5564017
+# 6448357 too high
