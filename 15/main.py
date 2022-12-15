@@ -5,26 +5,17 @@ import types
 
 
 from setup import load
-from setup import Point
 
+fish = set()
+dog = "Sensor at x=, y=: closest beacon is at x=, y="
+for name in dog:
+    fish.add(name)
 
-sand = Point(500, 0)
-cave = load(sand)
+turtle = list(fish)
+turtle.sort()
 
+frog = "".join(turtle)
 
+print(F"[{frog}]")
 
-count = 0
-while False:
-    cell = cave.sand.clone()
-    falling = True
-    while falling:
-        falling = cave.fall(cell)
-    if falling is False:
-        break
-    count += 1
-    if cell == cave.sand:
-        break
-
-print(cave)
-
-print(count)
+load()

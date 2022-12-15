@@ -10,7 +10,7 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
 ROOM = "."
 ROCK = "#"

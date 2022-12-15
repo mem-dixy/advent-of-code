@@ -10,13 +10,17 @@ GREATER_THAN_SIGN = chr(0x003E)
 
 ARROW = NONE.join([SPACE, HYPHEN_MINUS, GREATER_THAN_SIGN, SPACE])
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
-ROOM = "."
-ROCK = "#"
-DROP = "+"
-SAND = "o"
-FLOW = "~"
+JUNK = " ,:=Sabceilnorstxy"
+
+INFINITY = 9876543210
+
+SENSOR = "S"
+BEACON = "B"
+NETHER = "."
+SCANED = "#"
+
 
 
 class Point():
@@ -154,66 +158,56 @@ class Cave(Maze):
 
 
 def map_scan():
-    rock = []
+    sensors = []
+    beacons = []
     with open(FILE) as file:
         read = file.read().strip()
         data = read.split(LINE_FEED)
         for line in data:
-            replace = line.replace(ARROW, SPACE)
-            split = replace.split(SPACE)
-            row = []
-            for item in split:
-                value = item.split(COMMA)
-                point = Point(*value)
-                row.append(point)
-            rock.append(row)
-    return rock
+            points = line.replace(":", ",").split(",")
+            info = [point.strip(JUNK) for point in points]
+            sensor = Point(info[0], info[1])
+            beacon = Point(info[2], info[3])
+            sensors.append(sensor)
+            beacons.append(beacon)
+    return (sensors, beacons)
 
 
-def map_bounds(rock, sand):
-    min_x = sand.index_x
-    min_y = sand.index_y
-    max_x = sand.index_x
-    max_y = sand.index_y
-    for dirt in rock:
-        for item in dirt:
-            index_x = item.index_x
-            index_y = item.index_y
-            min_x = min(min_x, index_x)
-            min_y = min(min_y, index_y)
-            max_x = max(max_x, index_x)
-            max_y = max(max_y, index_y)
-
-    min_y += 0
-    max_y += 2
-
-    tall = max_y - min_y
-
-    min_x = min(min_x, sand.index_x - tall)
-    max_x = max(max_x, sand.index_x + tall)
-
-    return (min_x, max_x, min_y, max_y)
+def map_bounds(points):
+    min_x = + INFINITY
+    min_y = + INFINITY
+    max_x = - INFINITY
+    max_y = - INFINITY
+    for point in points:
+        min_x = min(min_x, point.index_x)
+        min_y = min(min_y, point.index_y)
+        max_x = max(max_x, point.index_x)
+        max_y = max(max_y, point.index_y)
+    width = 1 + max_x - min_x
+    height = 1 + max_y - min_y
+    push = -min_x
+    lift = -min_y
+    return (width, height, push, lift)
 
 
 def point_resize(point, bounds):
-    (min_x, max_x, min_y, max_y) = bounds
-    point.index_x = 1 + point.index_x - min_x
-    point.index_y = 1 + point.index_y - min_y
-    return point
+    (width, height, push, lift) = bounds
+    point.index_x += push
+    point.index_y += lift
 
 
-def map_resize(rock, bounds):
-    for dirt in rock:
-        for item in dirt:
-            point_resize(item, bounds)
-    return rock
+def map_resize(points, bounds):
+    for point in points:
+        point_resize(point, bounds)
 
 
-def load(sand):
-    rock = map_scan()
-    bounds = map_bounds(rock, sand)
-    rock = map_resize(rock, bounds)
-    sand = point_resize(sand, bounds)
-    cave = Cave(bounds, sand)
-    cave.paint(rock)
-    return cave
+def load():
+    (sensors, beacons) = map_scan()
+    points = sensors + beacons
+    bounds = map_bounds(points)
+    map_resize(points, bounds)
+
+#    cave = Cave(bounds, sand)
+#    return cave
+
+load()
