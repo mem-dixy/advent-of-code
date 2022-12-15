@@ -36,42 +36,23 @@ class Point():
 
 
 class Cave(Maze):
-    def __init__(self, bounds, sand):
+    def __init__(self, bounds):
 
-        (min_x, max_x, min_y, max_y) = bounds
+        (width, height, push, lift) = bounds
 
-        width = 3 + max_x - min_x
-        height = 3 + max_y - min_y
+
         size = width * height
 
         super().__init__(width, height)
 
-        self.sand = Cell(self.grid)
-        self.sand.goto(sand.index_x, sand.index_y)
 
         self.data = [None] * size
 
-        self.draw = [ROOM] * size
-        self.draw[self.sand.index()] = DROP
+        self.draw = [NETHER] * size
 
-        self.valid = [True] * size
-        self.valid[self.sand.index()] = None
-        for index in range(size):
-            cell = Cell.from_index(self.grid, index)
-
-            g = cell.grid.axis_y.point == cell.grid.axis_y.size - 2
-
-            a = cell.grid.axis_x.point <= 0
-            b = cell.grid.axis_x.point >= cell.grid.axis_x.size - 1
-            d = cell.grid.axis_y.point <= 0
-            e = cell.grid.axis_y.point >= cell.grid.axis_y.size - 1
-            if a or b or d or e:
-                self.valid[cell.index()] = False
-            if g and not a and not b:
-                self.data[cell.index()] = True
-                self.draw[cell.index()] = ROCK
-
-    def paint(self, rock):
+    def paint(self, points):
+        for point in points:
+            pass
         for dirt in rock:
             start = None
             finish = None
@@ -173,7 +154,7 @@ def map_scan():
     return (sensors, beacons)
 
 
-def map_bounds(points):
+def map_bounds(points, move):
     min_x = + INFINITY
     min_y = + INFINITY
     max_x = - INFINITY
@@ -183,10 +164,12 @@ def map_bounds(points):
         min_y = min(min_y, point.index_y)
         max_x = max(max_x, point.index_x)
         max_y = max(max_y, point.index_y)
-    width = 1 + max_x - min_x
-    height = 1 + max_y - min_y
-    push = -min_x
-    lift = -min_y
+    wide = 1 + abs(min_x) + abs(max_x)
+    tall = 1 + abs(min_y) + abs(max_y)
+    width = max(wide, tall + tall + 1)
+    height = tall
+    push = wide - max_x
+    lift = -move.index_y
     return (width, height, push, lift)
 
 
@@ -201,13 +184,12 @@ def map_resize(points, bounds):
         point_resize(point, bounds)
 
 
-def load():
+def load(point):
     (sensors, beacons) = map_scan()
     points = sensors + beacons
-    bounds = map_bounds(points)
-    map_resize(points, bounds)
+    bounds = map_bounds(points, point)
+    map_resize(sensors, bounds)
+    map_resize(beacons, bounds)
+    point_resize(point, bounds)
+    return (sensors, beacons, bounds)
 
-#    cave = Cave(bounds, sand)
-#    return cave
-
-load()
