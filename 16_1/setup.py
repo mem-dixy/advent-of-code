@@ -1,6 +1,12 @@
+NONE = str()
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
 COMMA = chr(0x002C)
+HYPHEN_MINUS = chr(0x002D)
+GREATER_THAN_SIGN = chr(0x003E)
+
+START = "AA"
+DISTANCE = 30
 
 
 def tunnel_key(one, two):
@@ -52,7 +58,7 @@ def open_file(file):
         for tunnel in tunnels:
             maze_node.add(tunnel.strip(COMMA))
 
-        if rate > 0:
+        if rate > 0 or valve == START:
             maze_valve[valve] = rate
 
     maze_tunnel = tunnel_master(maze_node)
