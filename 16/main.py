@@ -5,8 +5,7 @@ import typing
 import types
 
 FILE = "input.txt"
-FILE = "sample.txt"
-
+# FILE = "sample.txt"
 
 
 (maze_node, maze_valve, maze_tunnel) = load(FILE)
@@ -14,7 +13,6 @@ FILE = "sample.txt"
 
 # maze_valve.get(valve, 0)
 # maze_valve.get(valve, INFINITY)
-
 
 
 class Runner():
@@ -30,44 +28,47 @@ class Runner():
             self.visited[node] = False
             self.scores[node] = 0
 
-    def runner(self, location, time):
-        for (destination, distance) in self.tunnel[location].items():
-            if distance is None:
-                continue
-
-            if self.visited[destination]:
-                continue
-
-
-            wait = distance + 1
-            distance = time - wait
-            if distance < 0:
-                continue
-
-            # update flow
-            for node in self.node:
-                if self.visited[node]:
-                    self.scores[node] += self.valve[node] * wait
-
-            # see how we doing
+    def spice_must_flow(self, wait, no_time_travel):
+        for node in self.node:
+            if self.visited[node]:
+                value = self.valve[node] * wait
+                if no_time_travel:
+                    self.scores[node] += value
+                else:
+                    self.scores[node] -= value
+                    total = 0
+        if no_time_travel:
             total = 0
             for (item, score) in self.scores.items():
                 total += score
             self.best = max(self.best, total)
 
-            #  travel to next node
+    def runner(self, location, time):
+        for (destination, distance) in self.tunnel[location].items():
+            if distance is None:
+                self.spice_must_flow(time, True)
+                self.spice_must_flow(time, False)
+                continue
+
+            if self.visited[destination]:
+                self.spice_must_flow(time, True)
+                self.spice_must_flow(time, False)
+                continue
+
+            wait = distance + 1
+            distance = time - wait
+            if distance < 0:
+                self.spice_must_flow(time, True)
+                self.spice_must_flow(time, False)
+                continue
+
+            self.spice_must_flow(wait, True)
             self.visited[destination] = True
 
             self.runner(destination, distance)
 
-            # begin undo backtrack
             self.visited[destination] = False
-
-            # undo update flow
-            for node in self.node:
-                if self.visited[node]:
-                    self.scores[node] -= self.valve[node] * wait
-
+            self.spice_must_flow(wait, False)
 
     def start_running(self):
         start = "AA"
@@ -76,8 +77,10 @@ class Runner():
         self.runner(start, distance)
         print(self.best)
 
+
 run = Runner(maze_node, maze_valve, maze_tunnel)
 run.start_running()
+
 
 def draw():
     string = io.StringIO(FILE)
