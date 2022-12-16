@@ -16,14 +16,19 @@ COMMA = chr(0x002C)
 HYPHEN_MINUS = chr(0x002D)
 GREATER_THAN_SIGN = chr(0x003E)
 
+INFINITY = 9876543210
+
+
 def tunnel_key(one, two):
     return F"{one}-{two}"
 
-def tunnel_map(maze_node, value):
+
+def tunnel_map(maze_node):
     tunnel = {}
     for node in maze_node:
-        tunnel[node] = value
+        tunnel[node] = None
     return tunnel
+
 
 def tunnel_path(tunnel):
     for (key, value) in tunnel.items():
@@ -37,6 +42,7 @@ def file_read():
         strip = read.strip()
         split = strip.split(LINE_FEED)
     return split
+
 
 def open_file():
     maze_node = set({})
@@ -57,9 +63,9 @@ def open_file():
         if rate > 0:
             maze_valve[valve] = rate
 
-    maze_tunnel = tunnel_map(maze_node, None)
+    maze_tunnel = tunnel_map(maze_node)
     for node in maze_node:
-        maze_tunnel[node] = tunnel_map(maze_node, None)
+        maze_tunnel[node] = tunnel_map(maze_node)
 
     for line in lines:
         split = line.split(SPACE)
@@ -70,55 +76,58 @@ def open_file():
             maze_tunnel[valve][tunnel.strip(COMMA)] = 1
             maze_tunnel[tunnel.strip(COMMA)][valve] = 1
 
-    print(len(maze_node))
-
     return (maze_node, maze_valve, maze_tunnel)
 
-def rarct(maze_tunnel, start, final, distance):
-    cat = maze_tunnel[start][final]
-    if cat is None or cat > distance:
 
-        maze_tunnel[start][final] = distance
+def explore(maze_tunnel, origin, location, depth):
+    for (destination, distance) in maze_tunnel[location].items():
+        if distance is None:
+            continue
 
-def monkoy(maze_tunnel, start, final, distance):
-    distance = 0
-    tunnels = tunnel_path(maze_tunnel[node])
-    for tunnel in tunnels:
+        if destination == origin:
+            continue
 
-    maze_tunnel[start][final] = distance
-    tunnels = tunnel_path(maze_tunnel[node])
-    for tunnel in tunnels:
+        distance += depth
+        length = maze_tunnel[origin][destination]
 
-def explore(maze_tunnel, visited, node):
-    tunnels = tunnel_path(maze_tunnel[node])
-    for tunnel in tunnels:
+        if length and length <= distance:
+            continue
 
+        maze_tunnel[origin][destination] = distance
+        explore(maze_tunnel, origin, destination, distance)
+
+
+def start(maze_tunnel, maze_node):
+    for start in maze_node:
+        for final in maze_node:
+            distance = maze_tunnel[start][final]
+            if distance is None:
+                continue
+            explore(maze_tunnel, start, final, distance)
 
 
 def make_maze():
     (maze_node, maze_valve, maze_tunnel) = open_file()
+    start(maze_tunnel, maze_node)
+    print("HI")
 
-
-    for node in maze_node:
-        visited = tunnel_map(maze_node, False)
-        tunnels = tunnel_path(maze_tunnel[node])
-        for tunnel in tunnels:
-
-
-        tunnels = [(key, value)
-                    for (key, value) in maze_tunnel[node].items() if value]
-
-        print("HI")
-
-
-
-    return tunnel
-
+    return (maze_node, maze_valve, maze_tunnel)
 
 
 def load():
     return make_maze()
 
 
-load()
+(maze_node, maze_valve, maze_tunnel) = load()
 
+
+
+string = io.StringIO()
+for maze in maze_tunnel:
+    string.write(F"{maze}:\n")
+    for (destination, distance) in maze_tunnel[maze].items():
+        if distance is None:
+            continue
+        string.write(F"    {destination} = {distance}\n")
+
+print(string.getvalue())
