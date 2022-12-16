@@ -5,6 +5,8 @@ COMMA = chr(0x002C)
 HYPHEN_MINUS = chr(0x002D)
 GREATER_THAN_SIGN = chr(0x003E)
 
+START = "AA"
+DISTANCE = 30
 
 def tunnel_key(one, two):
     return F"{one}-{two}"
@@ -54,7 +56,8 @@ def open_file(file):
         maze_node.add(valve)
         for tunnel in tunnels:
             maze_node.add(tunnel.strip(COMMA))
-        if rate > 0:
+
+        if rate > 0 or valve == START:
             maze_valve[valve] = rate
 
     maze_tunnel = tunnel_master(maze_node)
@@ -103,6 +106,7 @@ def trim_maze(maze_node, maze_valve, maze_tunnel):
     for (valve, rate) in maze_valve.items():
         valves.add(valve)
 
+    valves.add(START)
     tunnel = tunnel_master(maze_node)
     for start in tunnel:
         if start not in valves:
