@@ -20,9 +20,11 @@ def tunnel_master(maze_node):
         maze_tunnel[node] = tunnel_map(maze_node)
     return maze_tunnel
 
+
 def timekey(node, time):
     key = "0" + str(time)
     return F"{node}-{key[-2:]}"
+
 
 def time_map(maze_node, distance):
     maze = {}
@@ -172,6 +174,7 @@ def time_travel(maze_tree, maze_tunnel, location, options, clock):
             time
         )
 
+
 def time_trim(maze_tree, maze_node, distance):
     for start_node in maze_node:
         for start_time in range(distance, -1, -1):
@@ -188,6 +191,16 @@ def time_trim(maze_tree, maze_node, distance):
                 del maze_tree[start]
 
 
+def time_redo(maze_tree):
+    maze_redo = {}
+    for (start_key, start_value) in maze_tree.items():
+        maze_redo[start_key] = set({})
+    for (start_key, start_value) in maze_tree.items():
+        for (end_key, end_value) in maze_tree[start_key].items():
+            if end_value:
+                maze_redo[start_key].add(end_key)
+    return maze_redo
+
 
 def load(file, start, distance):
     (maze_node, maze_valve, maze_tunnel, start_state) = make_maze(file, start)
@@ -200,5 +213,7 @@ def load(file, start, distance):
     print("time_travel")
     time_trim(maze_tree, maze_node, distance)
     print("time_trim")
-    return (maze_node, maze_valve, maze_tunnel, start_state)
+    maze_redo = time_redo(maze_tree)
+    print("time_redo")
+    return (maze_node, maze_valve, maze_redo)
 
