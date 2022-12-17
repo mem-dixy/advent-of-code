@@ -43,60 +43,6 @@ class Runner():
                 total += score
             self.best = max(self.best, total)
 
-
-    def human(self, clock, wait):
-        time = wait
-        while time > 0:
-            yield
-            time -= 1
-
-
-        for (destination, distance) in self.tunnel[location].items():
-            if distance is None:
-                self.spice_must_flow(time, True)
-                self.spice_must_flow(time, False)
-                continue
-
-        human(clock - wait,
-
-
-    def countdown(self, clock):
-        time = clock - 1
-
-        do_work(1)
-        do_work(2)
-
-        self.countdown(time)
-
-
-    def runner(self, location, timer, wait):
-        time = wait
-        while time > 0:
-            yield
-            time -= 1
-
-        for (destination, distance) in self.tunnel[location].items():
-            if self.visited[destination]:
-                self.spice_must_flow(time, True)
-                self.spice_must_flow(time, False)
-                continue
-
-            wait = distance + 1
-            distance = time - wait
-            if distance < 0:
-                self.spice_must_flow(time, True)
-                self.spice_must_flow(time, False)
-                continue
-
-            self.spice_must_flow(wait, True)
-            self.visited[destination] = True
-
-            self.runner(destination, distance)
-
-            self.visited[destination] = False
-            self.spice_must_flow(wait, False)
-
-
     def runner(self, location, time):
         for (destination, distance) in self.tunnel[location].items():
             if distance is None:
@@ -129,9 +75,6 @@ class Runner():
         distance = 30
         self.visited[start] = True
         self.runner(start, distance)
-
-
-        self.runner(start, distance, 0)
         print(self.best)
 
 
