@@ -8,7 +8,7 @@ FILE = "sample.txt"
 LIMIT = 2022
 
 WIDTH_INSIDE = 7
-HEIGHT_INSIDE = 15
+HEIGHT_INSIDE = 3100
 SIZE_INSIDE = WIDTH_INSIDE * HEIGHT_INSIDE
 
 WIDTH_OUTSIDE = WIDTH_INSIDE + 2
@@ -27,23 +27,6 @@ LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
 COMMA = chr(0x002C)
 
-####
-
-#  .#.
-# ###
-#  .#.
-
-# ..#
-# ..#
-# ###
-
-#
-#
-#
-#
-
-##
-##
 
 class Rock():
     def __init__(self, index, width, shape):
@@ -75,6 +58,8 @@ class Rock():
 
         if blocked:
             self.shape = before
+
+        return blocked
 
     def spawn(self):
         array = []
@@ -155,24 +140,28 @@ class Rock5(Rock):
             ],
         )
 
-# TOD he five roct tymaoes snotehu in the order belowe
-
 
 class Rocky():
-    def __init__(self, wind):
-        self.wind = wind
-        self.fall = self.leaf()
+    def __init__(self):
+        self.rocky = [1, 2, 3, 4, 5]
+        self.tree = self.leaf()
 
     def leaf(self):
         while True:
-            yield from self.wind
+            yield from self.rocky
 
-    def blow(self):
-        match next(self.fall):
-            case "<":
-                return -1
-            case ">":
-                return +1
+    def fall_off(self, index):
+        match next(self.tree):
+            case 1:
+                return Rock1(index)
+            case 2:
+                return Rock2(index)
+            case 3:
+                return Rock3(index)
+            case 4:
+                return Rock4(index)
+            case 5:
+                return Rock5(index)
         raise AttributeError
 
 
@@ -196,6 +185,8 @@ class Wind():
 
 class Canyon():
     def __init__(self):
+        self.wind = Wind(load(FILE))
+        self.rocky = Rocky()
         self.column = [AIR] * SIZE_OUTSIDE
         for index in range(SIZE_OUTSIDE):
             draw = AIR
@@ -248,10 +239,12 @@ class Canyon():
         index_y = HEIGHT_INSIDE - (1 + self.tallness() + SPAWN_Y)
         index = index_y * WIDTH_OUTSIDE + index_x
 
-        rock = Rock2(index)
-        rock.move(self, -1)
-        rock.move(self, -1)
-        rock.move(self, -1)
+        rock = self.rocky.fall_off(index)
+
+        floating = True
+        while floating:
+            rock.move(self, self.wind.blow())
+            floating = not rock.move(self, 0)
 
 
         for offset in rock.spawn():
@@ -272,8 +265,9 @@ class Canyon():
 
 
 canyon = Canyon()
-canyon.spawn()
-wind = Wind(load(FILE))
-# print(wind.blow())
+
+for index in range(LIMIT):
+    canyon.spawn()
 
 print(canyon.display())
+print(canyon.tallness())
