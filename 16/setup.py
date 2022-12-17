@@ -1,12 +1,6 @@
-NONE = str()
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
 COMMA = chr(0x002C)
-HYPHEN_MINUS = chr(0x002D)
-GREATER_THAN_SIGN = chr(0x003E)
-
-START = "AA"
-DISTANCE = 30
 
 
 def tunnel_key(one, two):
@@ -58,8 +52,7 @@ def open_file(file):
         for tunnel in tunnels:
             maze_node.add(tunnel.strip(COMMA))
 
-        if rate > 0 or valve == START:
-            maze_valve[valve] = rate
+        maze_valve[valve] = rate
 
     maze_tunnel = tunnel_master(maze_node)
 
@@ -102,29 +95,42 @@ def start_explore(maze_tunnel, maze_node):
             explore(maze_tunnel, start, final, distance)
 
 
-def trim_maze(maze_node, maze_valve, maze_tunnel):
-    valves = set({})
-    for (valve, rate) in maze_valve.items():
-        valves.add(valve)
+def trim_maze(maze_node, maze_valve, maze_tunnel, state):
+    start_state = {}
+    for (destination, distance) in maze_tunnel[state].items():
+        if distance:
+            start_state[destination] = distance
 
-    valves.add(START)
+    keep_valves = set({})
+    for (valve, rate) in maze_valve.items():
+        if rate and rate > 0:
+            keep_valves.add(valve)
+
     tunnel = tunnel_master(maze_node)
     for start in tunnel:
-        if start not in valves:
+        if start not in keep_valves:
             maze_node.remove(start)
+            del maze_valve[start]
             del maze_tunnel[start]
         else:
             for final in tunnel:
-                if final not in valves:
+                if final not in keep_valves:
                     del maze_tunnel[start][final]
 
+    items = [destination for (destination, distance) in start_state.items()]
+    for item in items:
+        if item not in keep_valves:
+            del start_state[item]
 
-def make_maze(file):
+    return start_state
+
+
+def make_maze(file, start):
     (maze_node, maze_valve, maze_tunnel) = open_file(file)
     start_explore(maze_tunnel, maze_node)
-    trim_maze(maze_node, maze_valve, maze_tunnel)
-    return (maze_node, maze_valve, maze_tunnel)
+    start_state = trim_maze(maze_node, maze_valve, maze_tunnel, start)
+    return (maze_node, maze_valve, maze_tunnel, start_state)
 
 
-def load(file):
-    return make_maze(file)
+def load(file, start):
+    return make_maze(file, start)
