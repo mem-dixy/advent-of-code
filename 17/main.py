@@ -19,6 +19,9 @@ SPAWN_X = +2
 SPAWN_Y = +3
 AIR = "."
 ROCK = "#"
+FLOOR = "-"
+WALL = "|"
+CORNER = "+"
 
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
@@ -161,42 +164,79 @@ class Wind():
         raise AttributeError
 
 
-class Chamber():
+class Canyon():
     def __init__(self):
         self.column = [AIR] * SIZE_OUTSIDE
         for index in range(SIZE_OUTSIDE):
-            left = index % WIDTH_OUTSIDE == 0
-            right = index % WIDTH_OUTSIDE == WIDTH_OUTSIDE - 1
-            down = index // WIDTH_OUTSIDE >= HEIGHT_INSIDE
-            test = left or right or down
-            draw = ROCK if test else AIR
+            draw = AIR
+            if self._left(index):
+                draw = WALL
+            if self._right(index):
+                draw = WALL
+            if self._down(index):
+                if draw == WALL:
+                    draw = CORNER
+                else:
+                    draw = FLOOR
             self.column[index] = draw
+        self.column[60] = ROCK
+
+    def _left(self, index):
+        return index % WIDTH_OUTSIDE == 0
+
+    def _right(self, index):
+        return index % WIDTH_OUTSIDE == WIDTH_OUTSIDE - 1
+
+    def _down(self, index):
+        return index // WIDTH_OUTSIDE >= HEIGHT_INSIDE
+
+    def _border(self, index):
+        left = self._left(index)
+        right = self._right(index)
+        down = self._down(index)
+        return left or right or down
 
     def tallness(self):
-        best = 0
-        for index_x in range(WIDTH):
-            index = 0
-            for index_y in range(HEIGHT):
-                if self.column[index_x][index_y] == ROCK:
-                    index = index_y
-            best = max(best, index)
-        return best
+        for index_y in range(HEIGHT_OUTSIDE):
+            for index_x in range(WIDTH_OUTSIDE):
+                index = index_y * WIDTH_OUTSIDE + index_x
+                if self._border(index):
+                    continue
+                if self.column[index] == ROCK:
+                    return HEIGHT_INSIDE - index_y
+        return 0
+
+    def spawn(self):
+        # rock = Rock1()
+        index_x = 1 + SPAWN_X
+        index_y = HEIGHT_INSIDE - (1 + self.tallness() + SPAWN_Y)
+        print(self.tallness())
+        index = index_y * WIDTH_OUTSIDE + index_x
+        self.column[index] = ROCK
+
+        for index_y in range(HEIGHT_OUTSIDE):
+            for index_x in range(WIDTH_OUTSIDE):
+                index = index_y * WIDTH_OUTSIDE + index_x
+                if self._border(index):
+                    continue
+                if self.column[index] == ROCK:
+                    return HEIGHT_INSIDE - index_y
+        return 0
+
+    def display(self):
+        string = io.StringIO()
+        for index_y in range(HEIGHT_OUTSIDE):
+            for index_x in range(WIDTH_OUTSIDE):
+                index = index_y * WIDTH_OUTSIDE + index_x
+                string.write(self.column[index])
+            string.write(LINE_FEED)
+        return string.getvalue()
 
 
-chamber = Chamber()
+
+canyon = Canyon()
+canyon.spawn()
 wind = Wind(load(FILE))
 # print(wind.blow())
 
-string = io.StringIO()
-
-for index_y in range(HEIGHT_OUTSIDE):
-    print(index_y)
-    for index_x in range(WIDTH_OUTSIDE):
-        index = index_y * WIDTH_OUTSIDE + index_x
-        string.write(chamber.column[index])
-    string.write(LINE_FEED)
-
-print(string.getvalue())
-
-# print(chamber.tallness())
-
+print(canyon.display())
