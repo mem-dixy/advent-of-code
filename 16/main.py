@@ -3,7 +3,7 @@ import io
 
 
 FILE = "input.txt"
-# FILE = "sample.txt"
+FILE = "sample.txt"
 
 START = "AA"
 DISTANCE = 30
@@ -11,7 +11,7 @@ DISTANCE = 30
 for index in range(30, -1, -1):
     print(index)
 
-(maze_node, maze_valve, maze_tunnel, start_state) = load(FILE, START)
+(maze_node, maze_valve, maze_tunnel, start_state) = load(FILE, START, DISTANCE)
 
 
 # maze_valve.get(valve, 0)

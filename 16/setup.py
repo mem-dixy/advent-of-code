@@ -20,6 +20,25 @@ def tunnel_master(maze_node):
         maze_tunnel[node] = tunnel_map(maze_node)
     return maze_tunnel
 
+def timekey(node, time):
+    key = "0" + str(time)
+    return F"{node}-{key[-2:]}"
+
+def time_map(maze_node, distance):
+    maze = {}
+    for node in maze_node:
+        for time in range(distance, -1, -1):
+            maze[timekey(node, time)] = None
+    return maze
+
+
+def time_master(maze_node, distance):
+    maze_time = time_map(maze_node, distance)
+    for node in maze_node:
+        for time in range(distance, -1, -1):
+            maze_time[timekey(node, time)] = time_map(maze_node, distance)
+    return maze_time
+
 
 def tunnel_path(tunnel):
     for (key, value) in tunnel.items():
@@ -132,5 +151,54 @@ def make_maze(file, start):
     return (maze_node, maze_valve, maze_tunnel, start_state)
 
 
-def load(file, start):
-    return make_maze(file, start)
+def time_travel(maze_tree, maze_tunnel, location, options, clock):
+    for (destination, distance) in options.items():
+        if distance is None:
+            continue
+
+        turn_valve_time = 1
+        time = clock - (distance + turn_valve_time)
+        if time < 0:
+            continue
+
+        one = timekey(location, clock)
+        two = timekey(destination, time)
+        maze_tree[one][two] = True
+        time_travel(
+            maze_tree,
+            maze_tunnel,
+            destination,
+            maze_tunnel[destination],
+            time
+        )
+
+def time_trim(maze_tree, maze_node, distance):
+    for start_node in maze_node:
+        for start_time in range(distance, -1, -1):
+            for end_node in maze_node:
+                for end_time in range(distance, -1, -1):
+                    start = timekey(start_node, start_time)
+                    end = timekey(end_node, end_time)
+                    if not maze_tree[start][end]:
+                        del maze_tree[start][end]
+    for start_node in maze_node:
+        for start_time in range(distance, -1, -1):
+            start = timekey(start_node, start_time)
+            if not maze_tree[start] or len(maze_tree[start]) <= 0:
+                del maze_tree[start]
+
+
+
+def load(file, start, distance):
+    (maze_node, maze_valve, maze_tunnel, start_state) = make_maze(file, start)
+    print("make_maze")
+    maze_tree = time_master(maze_node, distance)
+    print("time_master")
+    maze_tree[timekey(start, distance)] = time_map(maze_node, distance)
+    print("time_map")
+    time_travel(maze_tree, maze_tunnel, start, start_state, distance)
+    print("time_travel")
+    time_trim(maze_tree, maze_node, distance)
+    print("time_trim")
+    return (maze_node, maze_valve, maze_tunnel, start_state)
+
