@@ -46,22 +46,48 @@ COMMA = chr(0x002C)
 ##
 
 class Rock():
-    def __init__(self, width, shape):
+    def __init__(self, index, width, shape):
+        self.index = index
         self.width = width
         self.shape = shape
         self.left = SPAWN_X
         self.right = SPAWN_X + width - 1
 
-    def move(self, air):
-        pass
+    def plan(self, air):
+        shape = []
+        for index in range(len(self.shape)):
+            (index_x, index_y) = self.shape[index]
+            if air:
+                index_x += air
+            else:
+                index_y += 1
+            shape.append((index_x, index_y))
+        self.shape = shape
 
 
+    def move(self, canyon, air):
+        before = self.shape
+        self.plan(air)
 
+        blocked = False
+        for offset in self.spawn():
+            blocked |= canyon.column[offset] != AIR
 
+        if blocked:
+            self.shape = before
+
+    def spawn(self):
+        array = []
+        for item in self.shape:
+            (offset_x, offset_y) = item
+            offset = offset_y * WIDTH_OUTSIDE + offset_x
+            array.append(self.index + offset)
+        return array
 
 class Rock1(Rock):
-    def __init__(self):
+    def __init__(self, index):
         super().__init__(
+            index,
             4,
             [
                 (0, 0),
@@ -73,55 +99,59 @@ class Rock1(Rock):
 
 
 class Rock2(Rock):
-    def __init__(self):
+    def __init__(self, index):
         super().__init__(
+            index,
             3,
             [
                 (1, 0),
-                (0, 1),
-                (1, 1),
-                (2, 1),
-                (1, 2),
+                (0, -1),
+                (1, -1),
+                (2, -1),
+                (1, -2),
             ],
         )
 
 
 class Rock3(Rock):
-    def __init__(self):
+    def __init__(self, index):
         super().__init__(
+            index,
             3,
             [
                 (0, 0),
                 (1, 0),
                 (2, 0),
-                (2, 1),
-                (2, 2),
+                (2, -1),
+                (2, -2),
             ],
         )
 
 
 class Rock4(Rock):
-    def __init__(self):
+    def __init__(self, index):
         super().__init__(
+            index,
             1,
             [
                 (0, 0),
-                (0, 1),
-                (0, 2),
-                (0, 3),
+                (0, -1),
+                (0, -2),
+                (0, -3),
             ],
         )
 
 
 class Rock5(Rock):
-    def __init__(self):
+    def __init__(self, index):
         super().__init__(
+            index,
             2,
             [
                 (0, 0),
                 (1, 0),
-                (0, 1),
-                (1, 1),
+                (0, -1),
+                (1, -1),
             ],
         )
 
@@ -179,7 +209,6 @@ class Canyon():
                 else:
                     draw = FLOOR
             self.column[index] = draw
-        self.column[60] = ROCK
 
     def _left(self, index):
         return index % WIDTH_OUTSIDE == 0
@@ -206,22 +235,30 @@ class Canyon():
                     return HEIGHT_INSIDE - index_y
         return 0
 
-    def spawn(self):
-        # rock = Rock1()
+    def safe(self, plan):
         index_x = 1 + SPAWN_X
         index_y = HEIGHT_INSIDE - (1 + self.tallness() + SPAWN_Y)
-        print(self.tallness())
         index = index_y * WIDTH_OUTSIDE + index_x
-        self.column[index] = ROCK
 
-        for index_y in range(HEIGHT_OUTSIDE):
-            for index_x in range(WIDTH_OUTSIDE):
-                index = index_y * WIDTH_OUTSIDE + index_x
-                if self._border(index):
-                    continue
-                if self.column[index] == ROCK:
-                    return HEIGHT_INSIDE - index_y
-        return 0
+        for offset in plan:
+            self.column[index + offset] = ROCK
+
+    def spawn(self):
+        index_x = 1 + SPAWN_X
+        index_y = HEIGHT_INSIDE - (1 + self.tallness() + SPAWN_Y)
+        index = index_y * WIDTH_OUTSIDE + index_x
+
+        rock = Rock2(index)
+        rock.move(self, -1)
+        rock.move(self, -1)
+        rock.move(self, -1)
+
+
+        for offset in rock.spawn():
+            self.column[offset] = ROCK
+
+
+
 
     def display(self):
         string = io.StringIO()
