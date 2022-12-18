@@ -5,14 +5,10 @@ import io
 FILE = "input.txt"
 # FILE = "sample.txt"
 
-LIMIT = 50455
-
-
-# 20065
-
+LIMIT = 2022
 
 WIDTH_INSIDE = 7
-HEIGHT_INSIDE = LIMIT * 2
+HEIGHT_INSIDE = 3100
 SIZE_INSIDE = WIDTH_INSIDE * HEIGHT_INSIDE
 
 WIDTH_OUTSIDE = WIDTH_INSIDE + 2
@@ -30,6 +26,10 @@ CORNER = "+"
 LINE_FEED = chr(0x000A)
 SPACE = chr(0x0020)
 COMMA = chr(0x002C)
+
+
+windy = load(FILE)
+
 
 class Rock():
     def __init__(self, index, width, shape):
@@ -258,7 +258,7 @@ class Canyon():
 
     def display(self):
         string = io.StringIO()
-        for index_y in range(32):
+        for index_y in range(HEIGHT_OUTSIDE):
             for index_x in range(WIDTH_OUTSIDE):
                 index = index_y * WIDTH_OUTSIDE + index_x
                 string.write(self.column[index])
@@ -268,13 +268,6 @@ class Canyon():
 
 
 canyon = Canyon()
-
-
-magic = 1000000000000
-wind_size = len(load(FILE))
-wind_size *= 5
-print(wind_size)
-print(magic % wind_size)
 
 for index in range(LIMIT):
     canyon.spawn()
