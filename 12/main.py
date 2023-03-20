@@ -39,12 +39,16 @@ class Hill(Maze):
 
         self.slope = heightmap
 
+        start = self.player.grid.index()
 
         self.distance = [INFINITY] * size
+        self.distance[start] = 0
 
         self.visited = [None] * size
+        self.visited[start] = False
 
         self.draw = data_lookup
+        self.draw = self.distance
 
 
     def __str__(
@@ -60,67 +64,54 @@ class Hill(Maze):
 def climbable(here, goto):
     return here + CLIMB_LIMIT <= goto
 
-
-data = None
+maze = None
 with open("input.txt") as file:
     data = file.read()
-
-
-
-def find_distance_from_cell(data, start):
     maze = Hill(data)
 
-    starting = start.index()
-    maze.distance[starting] = 0
-    maze.visited[starting] = False
 
-    array = []
-    array.append(start)
-    while array:
-        cell = array.pop(0)
-        index = cell.index()
+def happy_neighboar(neighboar):
+    neigh = boar.index()
 
-        slope = maze.slope[index]
-        distance = maze.distance[index]
+    maze.distance[neigh] = distance + 1
+    maze.visited[neigh] = False
 
-        maze.visited[index] = True
+    array.append(boar)
 
-        for boar in cell.neighbor():
-            neigh = boar.index()
-
-            if maze.visited[neigh] is not None:
-                continue
-
-            if slope + CLIMB_LIMIT < maze.slope[neigh]:
-                continue
-
-            maze.distance[neigh] = distance + 1
-            maze.visited[neigh] = False
-
-            array.append(boar)
+    distance = INFINITY
+    for boar in neighboar:
+        distance = min(distance, maze.distance[boar.index()])
+    return distance
 
 
-    return maze.distance[maze.finish.index()]
+array = []
+array.append(Cell.clone(maze.player))
+while array:
+    cell = array.pop(0)
+    index = cell.index()
+
+    slope = maze.slope[index]
+    distance = maze.distance[index]
+
+    maze.visited[index] = True
+
+    for boar in cell.neighbor():
+        neigh = boar.index()
+
+        if maze.visited[neigh] is not None:
+            continue
+
+        if slope + CLIMB_LIMIT < maze.slope[neigh]:
+            continue
+
+        maze.distance[neigh] = distance + 1
+        maze.visited[neigh] = False
+
+        array.append(boar)
 
 
-master = Hill(data)
 
-start_zone = []
-for index_y in range(master.grid.axis_y.size):
-    for index_x in range(master.grid.axis_x.size):
-        cell = Cell.clone(master.player)
-        cell.goto(index_x, index_y)
+print(maze)
 
-        draw = master.draw[cell.index()]
-        if draw == "S" or draw == "a":
-            start_zone.append(cell)
-
-distance = INFINITY
-for zone in start_zone:
-    result = find_distance_from_cell(data, zone)
-    # print(result)
-    distance = min(distance, find_distance_from_cell(data, zone))
-
-
-print(distance)
-
+goal = maze.finish.index()
+print(maze.distance[goal])
